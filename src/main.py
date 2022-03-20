@@ -8,6 +8,7 @@ from fastapi.responses import ORJSONResponse
 
 from api.v1 import films
 from core import config
+from core.config import APP_HOST, APP_PORT
 from core.logger import LOGGING
 from db import elastic, redis
 
@@ -46,8 +47,8 @@ async def shutdown():
 if __name__ == '__main__':
     uvicorn.run(
         app='main:app',
-        host='0.0.0.0',
-        port=8000,
+        host=APP_HOST,
+        port=APP_PORT,
         log_config=LOGGING,
         log_level=logging.DEBUG,
     )
