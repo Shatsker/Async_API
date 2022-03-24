@@ -1,16 +1,18 @@
 import os
-
 from logging import config as logging_config
+
+from dotenv import load_dotenv
 
 from core.logger import LOGGING
 
-
+load_dotenv()
 logging_config.dictConfig(LOGGING)
 
 PROJECT_NAME = os.getenv('PROJECT_NAME', 'shatsker_movies')
 
 APP_HOST = os.getenv('APP_HOST', '0.0.0.0')
-APP_PORT = os.getenv('APP_PORT', 8000)
+
+APP_PORT = int(os.getenv('APP_PORT', 8000))
 
 REDIS_HOST = os.getenv('REDIS_HOST', '127.0.0.1')
 REDIS_PORT = int(os.getenv('REDIS_PORT', 6379))
