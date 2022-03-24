@@ -12,13 +12,15 @@ from core.config import APP_HOST, APP_PORT
 from core.logger import LOGGING
 from db import elastic, redis
 
+
 app = FastAPI(
     title=config.PROJECT_NAME,
     docs_url='/api/openapi',
     openapi_url='/api/openapi.json',
-    # Можно заменить стандартный сериализатор на более шустрый, написанный на Rust
+    # Можно заменить стандартный сериализатор на более шустрый
     default_response_class=ORJSONResponse,
 )
+
 app.include_router(
     films.router,
     prefix='/api/v1/films',
