@@ -1,17 +1,20 @@
 import orjson
 import datetime
 
+from typing import Optional
+
 from pydantic import BaseModel
+from pydantic.fields import Field
 
 
 def orjson_dumps(v, *, default):
-    return orjson.dumps(v, default = default).decode()
+    return orjson.dumps(v, default=default).decode()
 
 
 class BasePerson(BaseModel):
     """Базовая модель персоны в кинопроизведениях."""
     id: str
-    full_name: str
+    name: Optional[str]
 
 
 class Person(BasePerson):
@@ -51,15 +54,15 @@ class FilmWork(BaseModel):
     """Базовая модель кинопроизведений."""
     id: str
     title: str
-    imdb_rating: float
-    description: str = None
-    type: str
-    creation_date: datetime.date
-    directors: list[Director]
-    actors: list[Actor]
-    writers: list[Writer]
-    genres: list[Genre]
-    file_path: str
+    imdb_rating: Optional[float]
+    description: Optional[str]
+    type: Optional[str]
+    creation_date: Optional[datetime.date]
+    directors: Optional[list[Director]]
+    actors: Optional[list[Actor]]
+    writers: Optional[list[Writer]]
+    genres: Optional[list[Genre]]
+    file_path: Optional[str]
 
     class Config:
         json_loads = orjson.loads
