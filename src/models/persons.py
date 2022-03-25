@@ -1,22 +1,17 @@
-import orjson
-import datetime
-
 from pydantic import BaseModel
 
-
-def orjson_dumps(v, *, default):
-    return orjson.dumps(v, default = default).decode()
+from typing import Optional
 
 
 class BasePerson(BaseModel):
     """Базовая модель персоны в кинопроизведениях."""
     id: str
-    full_name: str
+    name: Optional[str]
 
 
 class Person(BasePerson):
     """Модель всех персон, вне зависимости от роли."""
-    role: str
+    role: list[str] = None
     film_ids: list[str] = None
 
 
@@ -39,28 +34,3 @@ class Writer(BasePerson):
        Сюда можно заносить какие-то специфичные для сценаристов поля.
     """
     pass
-
-
-class Genre(BaseModel):
-    """Модель жанров в кинопроизведениях."""
-    id: str
-    name: str
-
-
-class FilmWork(BaseModel):
-    """Базовая модель кинопроизведений."""
-    id: str
-    title: str
-    imdb_rating: float
-    description: str = None
-    type: str
-    creation_date: datetime.date
-    directors: list[Director]
-    actors: list[Actor]
-    writers: list[Writer]
-    genres: list[Genre]
-    file_path: str
-
-    class Config:
-        json_loads = orjson.loads
-        json_dumps = orjson_dumps

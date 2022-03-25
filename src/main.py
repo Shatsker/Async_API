@@ -6,21 +6,23 @@ import uvicorn
 from fastapi import FastAPI
 from fastapi.responses import ORJSONResponse
 
-from api.v1 import films
+from api.v1 import film_works
 from core import config
 from core.config import APP_HOST, APP_PORT
 from core.logger import LOGGING
 from db import elastic, redis
 
+
 app = FastAPI(
     title=config.PROJECT_NAME,
     docs_url='/api/openapi',
     openapi_url='/api/openapi.json',
-    # Можно заменить стандартный сериализатор на более шустрый, написанный на Rust
+    # Можно заменить стандартный сериализатор на более шустрый
     default_response_class=ORJSONResponse,
 )
+
 app.include_router(
-    films.router,
+    film_works.router,
     prefix='/api/v1/films',
     tags=['film'],
 )
