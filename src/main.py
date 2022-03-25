@@ -6,7 +6,7 @@ import elasticsearch
 from fastapi import FastAPI
 from fastapi.responses import ORJSONResponse
 
-from api.v1 import films
+from api.v1 import film_works
 from core import config
 from core.config import APP_HOST, APP_PORT
 from core.logger import LOGGING
@@ -22,7 +22,7 @@ app = FastAPI(
 )
 
 app.include_router(
-    films.router,
+    film_works.router,
     prefix='/api/v1/films',
     tags=['film'],
 )

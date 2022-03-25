@@ -2,7 +2,7 @@ from pydantic import BaseModel
 
 from typing import Optional
 
-from .films import Actor, Writer, Genre, Director
+from models.film_works import Actor, Writer, Genre, Director
 
 
 class FilmWorkForResponse(BaseModel):
