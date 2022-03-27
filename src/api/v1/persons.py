@@ -1,6 +1,7 @@
 from typing import Optional
+from uuid import UUID
 
-from fastapi.params import Depends, Query
+from fastapi.params import Depends, Path, Query
 from fastapi.routing import APIRouter
 
 from core import config
@@ -11,7 +12,7 @@ router = APIRouter()
 
 
 @router.get('/search/', response_model=list[PersonResponse])
-async def get_searched_film_works(
+async def get_searched_persons(
         service: PersonService = Depends(get_person_service),
         page_size: int = Query(config.DEFAULT_PAGE_SIZE, alias='page[size]', description='Размер страницы.'),
         page_number: int = Query(config.DEFAULT_PAGE_NUMBER, alias='page[number]', description='Номер страницы.'),
@@ -24,3 +25,13 @@ async def get_searched_film_works(
         search_query=search_query,
     )
     return [PersonResponse.parse_obj(p) for p in persons]
+
+
+@router.get('/{person_id}', response_model=PersonResponse)
+async def get_persons_by_id(
+        person_id: UUID = Path(..., description='UUID персоны'),
+        service: PersonService = Depends(get_person_service),
+) -> Optional[PersonResponse]:
+    """Обработчик запроса на получение персоны по ID"""
+    person = await service.get_person_by_uuid(person_id)
+    return PersonResponse.parse_obj(person)

@@ -1,5 +1,7 @@
 from abc import ABC, abstractmethod
 
+from core.enums import ElasticIndexes
+
 
 class BaseCacheService(ABC):
     """Абстрактный класс для сервиса кеширования."""
@@ -24,7 +26,7 @@ class BaseSearchService(ABC):
         pass
 
     @abstractmethod
-    def get_data_of_one_model_by_id_from_storage(self, *args, **kwargs):
+    def get_data_of_one_model_by_id_from_storage(self, index: ElasticIndexes, model_id: str, model):
         pass
 
     @abstractmethod

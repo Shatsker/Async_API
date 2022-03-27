@@ -60,7 +60,8 @@ class FilmService(BaseServicesMixin):
 
         if not film_work:
             film_work = await self.search_service.get_data_of_one_model_by_id_from_storage(
-                film_work_id,
+                index=ElasticIndexes.MOVIES,
+                model_id=film_work_id,
                 model=FilmWork,
             )
             if not film_work:

@@ -1,17 +1,15 @@
-from typing import Optional
 from abc import ABC
+from typing import Optional
 
 from aioredis import Redis
-
 from elasticsearch import AsyncElasticsearch
 from elasticsearch.exceptions import NotFoundError
-
 from fastapi.params import Depends
 from pydantic import BaseModel
 
-from db.redis import get_redis
-from db.elastic import get_elastic
 from core import config
+from db.elastic import get_elastic
+from db.redis import get_redis
 
 from .base import BaseCacheService, BaseSearchService
 
@@ -88,10 +86,10 @@ class ElasticSearchService(BaseSearchService, ABC):
         )
         return [model(**doc['_source']) for doc in documents['hits']['hits']]
 
-    async def get_data_of_one_model_by_id_from_storage(self, model_id, model):
+    async def get_data_of_one_model_by_id_from_storage(self, index, model_id, model):
         """Возвращает объект переданной модели из elastic'а по id документа."""
         try:
-            document = await self.elastic.get('movies', model_id)
+            document = await self.elastic.get(index.value, model_id)
         except NotFoundError:
             return None
         else:

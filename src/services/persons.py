@@ -1,5 +1,6 @@
 from functools import lru_cache
 from typing import Optional
+from uuid import UUID
 
 from fastapi.params import Depends
 
@@ -27,6 +28,13 @@ class PersonService(BaseServicesMixin):
             search_query=search_query,
             index_of_docs=ElasticIndexes.PERSONS.value,
             fields_for_searching=config.FIELDS_FOR_SEARCHING_PERSONS,
+        )
+
+    async def get_person_by_uuid(self, uuid: UUID) -> Optional[Person]:
+        return await self.search_service.get_data_of_one_model_by_id_from_storage(
+            index=ElasticIndexes.PERSONS,
+            model_id=uuid,
+            model=Person
         )
 
 
