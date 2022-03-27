@@ -7,13 +7,13 @@ from models.film_works import Actor, Director, Genre, Writer
 
 
 class FilmWorkForResponse(BaseModel):
-    id: str
+    uuid: str
     title: str
     imdb_rating: Optional[float]
 
 
 class FullFilmWorkForResponse(BaseModel):
-    id: str
+    uuid: str
     title: str
     imdb_rating: Optional[float]
     description: Optional[str]
