@@ -1,4 +1,6 @@
 from abc import ABC, abstractmethod
+from typing import Union
+from uuid import UUID
 
 from core.enums import ElasticIndexes
 
@@ -26,7 +28,12 @@ class BaseSearchService(ABC):
         pass
 
     @abstractmethod
-    def get_data_of_one_model_by_id_from_storage(self, index: ElasticIndexes, model_id: str, model):
+    def get_data_of_one_model_by_id_from_storage(
+            self,
+            index: ElasticIndexes,
+            model_id: Union[str, UUID],
+            model
+    ):
         pass
 
     @abstractmethod
