@@ -73,7 +73,7 @@ class FilmService(BaseServicesMixin):
 
 
 @lru_cache()
-def get_film_services(
+def get_film_service(
         redis: RedisCacheService = Depends(RedisCacheService),
         elastic: ElasticSearchService = Depends(ElasticSearchService),
 ):

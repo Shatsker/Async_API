@@ -5,7 +5,7 @@ from fastapi.params import Depends, Path, Query
 from fastapi.routing import APIRouter
 
 from core import config
-from models.response_models import PersonResponse
+from models.response_models import FilmWorkForResponse, PersonResponse
 from services.persons import PersonService, get_person_service
 
 router = APIRouter()
@@ -35,3 +35,13 @@ async def get_persons_by_id(
     """Обработчик запроса на получение персоны по ID"""
     person = await service.get_person_by_uuid(person_id)
     return PersonResponse.parse_obj(person)
+
+
+@router.get('/{person_id}/film', response_model=list[FilmWorkForResponse])
+async def get_persons_film_works(
+        person_id: UUID = Path(..., description='UUID персоны'),
+        service: PersonService = Depends(get_person_service),
+) -> list[FilmWorkForResponse]:
+    """Обработчик запроса на получение персоны по ID"""
+    film_works = await service.get_person_film_works(person_id)
+    return film_works

@@ -16,7 +16,7 @@ class BasePerson(BaseModel):
 
 class Person(BaseModel):
     """Модель всех персон, вне зависимости от роли."""
-    uuid: str = Field(None, alias='id')
+    uuid: str = Field(..., alias='id')
     full_name: Optional[str]
     roles: list[str] = []
     film_ids: list[UUID] = []

@@ -1,14 +1,13 @@
 from http import HTTPStatus
-
 from typing import Optional
 
-from fastapi.routing import APIRouter
 from fastapi.exceptions import HTTPException
 from fastapi.params import Depends, Query
+from fastapi.routing import APIRouter
 
 from core import config
-from services.film_works import get_film_services, FilmService
-from models.response_models import FullFilmWorkForResponse, FilmWorkForResponse
+from models.response_models import FilmWorkForResponse, FullFilmWorkForResponse
+from services.film_works import FilmService, get_film_service
 
 router = APIRouter()
 
@@ -16,7 +15,7 @@ router = APIRouter()
 @router.get('/{film_id}', response_model=FullFilmWorkForResponse)
 async def get_film_by_id(
         film_id: str,
-        service: FilmService = Depends(get_film_services),
+        service: FilmService = Depends(get_film_service),
 ) -> Optional[FullFilmWorkForResponse]:
     """Получение кинопроизведения по id, если фильм отсутствует - ошибка 404."""
     film = await service.get_film_work_by_id(film_id)
@@ -30,7 +29,7 @@ async def get_film_by_id(
 
 @router.get('', response_model=list[FilmWorkForResponse])
 async def get_film_works(
-        service: FilmService = Depends(get_film_services),
+        service: FilmService = Depends(get_film_service),
         page_size: int = Query(config.DEFAULT_PAGE_SIZE, alias='page[size]', description='Размер страницы.'),
         page_number: int = Query(config.DEFAULT_PAGE_NUMBER, alias='page[number]', description='Номер страницы.'),
         filter_genre: str = Query(None, alias='filter[genre]', description='Сортировка по жанрам'),
@@ -48,7 +47,7 @@ async def get_film_works(
 
 @router.get('/search/', response_model=list[FilmWorkForResponse])
 async def get_searched_film_works(
-        service: FilmService = Depends(get_film_services),
+        service: FilmService = Depends(get_film_service),
         page_size: int = Query(config.DEFAULT_PAGE_SIZE, alias='page[size]', description='Размер страницы.'),
         page_number: int = Query(config.DEFAULT_PAGE_NUMBER, alias='page[number]', description='Номер страницы.'),
         search_query: str = Query(None, alias='query', description='Поиск по кинопроизведениям.'),
