@@ -6,12 +6,11 @@ import uvicorn
 from fastapi import FastAPI
 from fastapi.responses import ORJSONResponse
 
-from api.v1 import film_works
+from api.v1 import film_works, persons
 from core import config
 from core.config import APP_HOST, APP_PORT
 from core.logger import LOGGING
 from db import elastic, redis
-
 
 app = FastAPI(
     title=config.PROJECT_NAME,
@@ -25,6 +24,12 @@ app.include_router(
     film_works.router,
     prefix='/api/v1/films',
     tags=['film'],
+)
+
+app.include_router(
+    persons.router,
+    prefix='/api/v1/persons',
+    tags=['persons'],
 )
 
 

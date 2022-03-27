@@ -1,8 +1,9 @@
+from typing import Optional
+from uuid import UUID
+
 from pydantic import BaseModel
 
-from typing import Optional
-
-from models.film_works import Actor, Writer, Genre, Director
+from models.film_works import Actor, Director, Genre, Writer
 
 
 class FilmWorkForResponse(BaseModel):
@@ -20,3 +21,10 @@ class FullFilmWorkForResponse(BaseModel):
     actors: Optional[list[Actor]]
     writers: Optional[list[Writer]]
     genres: Optional[list[Genre]]
+
+
+class PersonResponse(BaseModel):
+    uuid: str
+    full_name: Optional[str]
+    roles: list[str] = []
+    film_ids: list[UUID] = []

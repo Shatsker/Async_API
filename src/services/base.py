@@ -33,7 +33,7 @@ class BaseSearchService(ABC):
         pass
 
 
-class ServiceMixin:
+class BaseServicesMixin:
     """Миксин с кешем и поиском."""
 
     def __init__(self, cache_service: BaseCacheService, search_service: BaseSearchService):

@@ -1,16 +1,13 @@
-import orjson
 import datetime
-
 from typing import Optional
 
+import orjson
 from pydantic import BaseModel
 
-from .persons import Actor, Writer, Director
+from core.utils import orjson_dumps
+
 from .genres import Genre
-
-
-def orjson_dumps(v, *, default):
-    return orjson.dumps(v, default=default).decode()
+from .persons import Actor, Director, Writer
 
 
 class FilmWork(BaseModel):
