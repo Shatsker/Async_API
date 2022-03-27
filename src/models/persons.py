@@ -3,7 +3,6 @@ from uuid import UUID
 
 import orjson
 from pydantic import BaseModel
-from pydantic.fields import Field
 
 from core.utils import orjson_dumps
 
@@ -16,7 +15,7 @@ class BasePerson(BaseModel):
 
 class Person(BaseModel):
     """Модель всех персон, вне зависимости от роли."""
-    uuid: str = Field(..., alias='id')
+    id: str
     full_name: Optional[str]
     roles: list[str] = []
     film_ids: list[UUID] = []

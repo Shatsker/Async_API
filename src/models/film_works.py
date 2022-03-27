@@ -2,7 +2,7 @@ import datetime
 from typing import Optional
 
 import orjson
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 from core.utils import orjson_dumps
 
@@ -12,7 +12,7 @@ from .persons import Actor, Director, Writer
 
 class FilmWork(BaseModel):
     """Базовая модель кинопроизведений."""
-    uuid: str = Field(..., alias='id')
+    id: str
     title: str
     imdb_rating: Optional[float]
     description: Optional[str]

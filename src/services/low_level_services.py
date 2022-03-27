@@ -29,7 +29,7 @@ class RedisCacheService(BaseCacheService, ABC):
     async def put_to_cache_by_id(self, model_for_caching: BaseModel):
         """Добавляем фильм из elastic'а в кеш по его id."""
         await self.redis.set(
-            model_for_caching.uuid,
+            model_for_caching.id,
             model_for_caching.json(),
             expire=config.FILM_CACHE_EXPIRE_IN_SECONDS,
         )

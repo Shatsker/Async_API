@@ -12,7 +12,7 @@ from services.film_works import FilmService, get_film_service
 router = APIRouter()
 
 
-@router.get('/{film_id}', response_model=FullFilmWorkForResponse)
+@router.get('/{film_id}', response_model=FullFilmWorkForResponse, response_model_by_alias=False)
 async def get_film_by_id(
         film_id: str,
         service: FilmService = Depends(get_film_service),
@@ -27,7 +27,7 @@ async def get_film_by_id(
     return FullFilmWorkForResponse.parse_obj(film)
 
 
-@router.get('', response_model=list[FilmWorkForResponse])
+@router.get('', response_model=list[FilmWorkForResponse], response_model_by_alias=False)
 async def get_film_works(
         service: FilmService = Depends(get_film_service),
         page_size: int = Query(config.DEFAULT_PAGE_SIZE, alias='page[size]', description='Размер страницы.'),
@@ -45,7 +45,7 @@ async def get_film_works(
     return [FilmWorkForResponse.parse_obj(fw) for fw in film_works]
 
 
-@router.get('/search/', response_model=list[FilmWorkForResponse])
+@router.get('/search/', response_model=list[FilmWorkForResponse], response_model_by_alias=False)
 async def get_searched_film_works(
         service: FilmService = Depends(get_film_service),
         page_size: int = Query(config.DEFAULT_PAGE_SIZE, alias='page[size]', description='Размер страницы.'),

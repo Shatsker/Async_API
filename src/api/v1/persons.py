@@ -11,7 +11,7 @@ from services.persons import PersonService, get_person_service
 router = APIRouter()
 
 
-@router.get('/search/', response_model=list[PersonResponse])
+@router.get('/search', response_model=list[PersonResponse], response_model_by_alias=False)
 async def get_searched_persons(
         service: PersonService = Depends(get_person_service),
         page_size: int = Query(config.DEFAULT_PAGE_SIZE, alias='page[size]', description='Размер страницы.'),
@@ -27,7 +27,7 @@ async def get_searched_persons(
     return [PersonResponse.parse_obj(p) for p in persons]
 
 
-@router.get('/{person_id}', response_model=PersonResponse)
+@router.get('/{person_id}', response_model=PersonResponse, response_model_by_alias=False)
 async def get_persons_by_id(
         person_id: UUID = Path(..., description='UUID персоны'),
         service: PersonService = Depends(get_person_service),
@@ -37,7 +37,7 @@ async def get_persons_by_id(
     return PersonResponse.parse_obj(person)
 
 
-@router.get('/{person_id}/film', response_model=list[FilmWorkForResponse])
+@router.get('/{person_id}/film', response_model=list[FilmWorkForResponse], response_model_by_alias=False)
 async def get_persons_film_works(
         person_id: UUID = Path(..., description='UUID персоны'),
         service: PersonService = Depends(get_person_service),
