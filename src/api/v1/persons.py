@@ -43,6 +43,6 @@ async def get_persons_film_works(
         person_id: UUID = Path(..., description='UUID персоны'),
         service: PersonService = Depends(get_person_service),
 ) -> list[FilmWorkForResponse]:
-    """Обработчик запроса на получение персоны по ID"""
+    """Обработчик запроса на получение фильмов по ID персоны"""
     film_works = await service.get_person_film_works(person_id)
     return film_works
