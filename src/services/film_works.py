@@ -1,21 +1,20 @@
 from functools import lru_cache
-
 from typing import Optional
 
 from fastapi import Depends
 
-from models.films.films import FilmWork
-from core.enums import ElasticIndexes, NestedObjectsFilter
 from core import config
+from core.enums import ElasticIndexes, NestedObjectsFilter
+from models.film_works import FilmWork
 
-from .base import BaseService
+from .base import BaseServicesMixin
 from .low_level_services import ElasticSearchService, RedisCacheService
 
 
-class FilmService(BaseService):
+class FilmService(BaseServicesMixin):
     """Класс, для бизнес-логики к фильмам."""
 
-    async def get_film_works_by_filtering_and_sorting(
+    async def get_film_works_from_storage_or_cache(
             self,
             page_size: Optional[int],
             page_number: Optional[int],
@@ -45,15 +44,15 @@ class FilmService(BaseService):
     ) -> Optional[list[FilmWork]]:
         """Получение фильмов по поиску из хранилища или кеша."""
         return await self.search_service.get_searched_data_from_storage(
+            model=FilmWork,
             page_size=page_size,
             page_number=page_number,
             search_query=search_query,
             index_of_docs=ElasticIndexes.MOVIES.value,
-            model=FilmWork,
             fields_for_searching=config.FIELDS_FOR_SEARCHING_FILMWORK,
         )
 
-    async def get_film_by_id(self, film_work_id: str) -> Optional[FilmWork]:
+    async def get_film_work_by_id(self, film_work_id: str) -> Optional[FilmWork]:
         """Возвращает фильм по id из кеша, или из хранилища.
            Если фильма нет - возвращает None.
         """
@@ -61,7 +60,8 @@ class FilmService(BaseService):
 
         if not film_work:
             film_work = await self.search_service.get_data_of_one_model_by_id_from_storage(
-                film_work_id,
+                index=ElasticIndexes.MOVIES,
+                model_id=film_work_id,
                 model=FilmWork,
             )
             if not film_work:
@@ -73,7 +73,7 @@ class FilmService(BaseService):
 
 
 @lru_cache()
-def get_film_services(
+def get_film_service(
         redis: RedisCacheService = Depends(RedisCacheService),
         elastic: ElasticSearchService = Depends(ElasticSearchService),
 ):
