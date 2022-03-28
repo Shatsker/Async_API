@@ -6,8 +6,8 @@ from fastapi.params import Depends
 
 from core import config
 from core.enums import ElasticIndexes
+from models.film_works import FilmWorkForResponse
 from models.persons import Person
-from models.response_models import FilmWorkForResponse
 from services.base import BaseServicesMixin
 from services.film_works import get_film_service
 from services.low_level_services import ElasticSearchService, RedisCacheService

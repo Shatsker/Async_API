@@ -6,7 +6,7 @@ from fastapi.exceptions import HTTPException
 from fastapi.params import Depends
 from fastapi.routing import APIRouter
 
-from models.response_models import GenreResponse
+from models.genres import GenreResponse
 from services.genres import GenreService, get_genre_service
 
 router = APIRouter()

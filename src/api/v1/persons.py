@@ -5,7 +5,8 @@ from fastapi.params import Depends, Path, Query
 from fastapi.routing import APIRouter
 
 from core import config
-from models.response_models import FilmWorkForResponse, PersonResponse
+from models.film_works import FilmWorkForResponse
+from models.persons import PersonResponse
 from services.persons import PersonService, get_person_service
 
 router = APIRouter()

@@ -2,7 +2,7 @@ from typing import Optional
 from uuid import UUID
 
 import orjson
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from core.utils import orjson_dumps
 
@@ -44,3 +44,10 @@ class Writer(BasePerson):
        Сюда можно заносить какие-то специфичные для сценаристов поля.
     """
     pass
+
+
+class PersonResponse(BaseModel):
+    uuid: str = Field(..., alias='id')
+    full_name: Optional[str]
+    roles: list[str] = []
+    film_ids: list[UUID] = []

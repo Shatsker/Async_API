@@ -6,7 +6,7 @@ from fastapi.params import Depends, Query
 from fastapi.routing import APIRouter
 
 from core import config
-from models.response_models import FilmWorkForResponse, FullFilmWorkForResponse
+from models.film_works import FilmWorkForResponse, FullFilmWorkForResponse
 from services.film_works import FilmService, get_film_service
 
 router = APIRouter()
