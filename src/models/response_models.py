@@ -28,3 +28,9 @@ class PersonResponse(BaseModel):
     full_name: Optional[str]
     roles: list[str] = []
     film_ids: list[UUID] = []
+
+
+class GenreResponse(BaseModel):
+    uuid: str = Field(..., alias='id')
+    name: str
+    description: Optional[str]

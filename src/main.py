@@ -6,7 +6,7 @@ import uvicorn
 from fastapi import FastAPI
 from fastapi.responses import ORJSONResponse
 
-from api.v1 import film_works, persons
+from api.v1 import film_works, genres, persons
 from core import config
 from core.config import APP_HOST, APP_PORT
 from core.logger import LOGGING
@@ -30,6 +30,12 @@ app.include_router(
     persons.router,
     prefix='/api/v1/persons',
     tags=['persons'],
+)
+
+app.include_router(
+    genres.router,
+    prefix='/api/v1/genres',
+    tags=['genres'],
 )
 
 
