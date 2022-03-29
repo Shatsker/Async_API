@@ -1,18 +1,17 @@
 from functools import lru_cache
-
 from typing import Optional
 
 from fastapi import Depends
 
-from models.film_works import FilmWork
-from core.enums import ElasticIndexes, NestedObjectsFilter
 from core import config
+from core.enums import ElasticIndexes, NestedObjectsFilter
+from models.film_works import FilmWork
 
-from .base import ServiceMixin
+from .base import BaseServicesMixin
 from .low_level_services import ElasticSearchService
 
 
-class FilmService(ServiceMixin):
+class FilmService(BaseServicesMixin):
     """Класс, для бизнес-логики к фильмам."""
 
     async def get_film_works_from_storage_or_cache(
@@ -60,11 +59,12 @@ class FilmService(ServiceMixin):
         return await self.search_service.get_data_of_one_model_by_id_from_storage(
             film_work_id,
             model=FilmWork,
+            index=ElasticIndexes.MOVIES,
         )
 
 
 @lru_cache()
-def get_film_services(
-        elastic: ElasticSearchService = Depends(ElasticSearchService),
+def get_film_service(
+    elastic: ElasticSearchService = Depends(ElasticSearchService),
 ):
     return FilmService(elastic)

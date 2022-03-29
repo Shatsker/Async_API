@@ -1,4 +1,8 @@
 from abc import ABC, abstractmethod
+from typing import Union
+from uuid import UUID
+
+from core.enums import ElasticIndexes
 
 
 class BaseCacheService(ABC):
@@ -24,8 +28,13 @@ class BaseSearchService(ABC):
         pass
 
     @abstractmethod
-    def get_data_of_one_model_by_id_from_storage(self, *args, **kwargs):
-        """Метод для получения данных для одной модели из хранилища."""
+    def get_data_of_one_model_by_id_from_storage(
+            self,
+            index: ElasticIndexes,
+            model_id: Union[str, UUID],
+            model
+    ):
+      """Метод для получения данных для одной модели из хранилища."""
         pass
 
     @abstractmethod
@@ -34,7 +43,7 @@ class BaseSearchService(ABC):
         pass
 
 
-class ServiceMixin:
+class BaseServicesMixin:
     """Миксин с поиском."""
 
     def __init__(self, search_service: BaseSearchService):

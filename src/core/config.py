@@ -28,3 +28,4 @@ DEFAULT_PAGE_NUMBER = 1
 DEFAULT_SORT_FOR_FILMWORKS = 'imdb_rating'
 
 FIELDS_FOR_SEARCHING_FILMWORK = ['title', 'description', 'genre', 'actors_names', 'writers_names']
+FIELDS_FOR_SEARCHING_PERSONS = ['full_name', ]

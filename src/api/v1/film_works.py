@@ -1,11 +1,10 @@
 from http import HTTPStatus
-
 from typing import Optional
 
-from fastapi.routing import APIRouter
 from fastapi.exceptions import HTTPException
 from fastapi.params import Depends, Query
 from fastapi.requests import Request
+from fastapi.routing import APIRouter
 
 from core import config
 from decorators import cache_result_of_handler
