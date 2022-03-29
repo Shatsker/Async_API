@@ -9,7 +9,7 @@ from core.enums import ElasticIndexes, NestedObjectsFilter
 from core import config
 
 from .base import ServiceMixin
-from .low_level_services import ElasticSearchService, RedisCacheService
+from .low_level_services import ElasticSearchService
 
 
 class FilmService(ServiceMixin):
@@ -17,10 +17,10 @@ class FilmService(ServiceMixin):
 
     async def get_film_works_from_storage_or_cache(
             self,
+            sort: Optional[str],
             page_size: Optional[int],
             page_number: Optional[int],
             filter_genre: Optional[str],
-            sort: Optional[str],
     ) -> Optional[list[FilmWork]]:
         """Возвращает фильмы, есть пагинация, сортировка & фильтрация.
            Достаёт из кеша или elastic'а, если кеш пуст.
@@ -33,7 +33,7 @@ class FilmService(ServiceMixin):
             index_of_docs=ElasticIndexes.MOVIES.value,
             filter_by_nested={
                 'name': NestedObjectsFilter.GENRES.value,
-                'value': filter_genre
+                'value': filter_genre,
             },
         )
 
@@ -57,24 +57,14 @@ class FilmService(ServiceMixin):
         """Возвращает фильм по id из кеша, или из хранилища.
            Если фильма нет - возвращает None.
         """
-        film_work = await self.cache_service.get_cache_by_id(film_work_id, model=FilmWork)
-
-        if not film_work:
-            film_work = await self.search_service.get_data_of_one_model_by_id_from_storage(
-                film_work_id,
-                model=FilmWork,
-            )
-            if not film_work:
-                return None
-
-            await self.cache_service.put_to_cache_by_id(model_for_caching=film_work)
-
-        return film_work
+        return await self.search_service.get_data_of_one_model_by_id_from_storage(
+            film_work_id,
+            model=FilmWork,
+        )
 
 
 @lru_cache()
 def get_film_services(
-        redis: RedisCacheService = Depends(RedisCacheService),
         elastic: ElasticSearchService = Depends(ElasticSearchService),
 ):
-    return FilmService(redis, elastic)
+    return FilmService(elastic)

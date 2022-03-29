@@ -5,31 +5,37 @@ from typing import Optional
 from fastapi.routing import APIRouter
 from fastapi.exceptions import HTTPException
 from fastapi.params import Depends, Query
+from fastapi.requests import Request
 
 from core import config
+from decorators import cache_result_of_handler
 from services.film_works import get_film_services, FilmService
 from models.response_models import FullFilmWorkForResponse, FilmWorkForResponse
 
 router = APIRouter()
 
 
-@router.get('/{film_id}', response_model=FullFilmWorkForResponse)
+@router.get('/{film_work_id}', response_model=FullFilmWorkForResponse)
+@cache_result_of_handler(model=FullFilmWorkForResponse)
 async def get_film_by_id(
-        film_id: str,
+        request: Request,
+        film_work_id: str,
         service: FilmService = Depends(get_film_services),
 ) -> Optional[FullFilmWorkForResponse]:
     """Получение кинопроизведения по id, если фильм отсутствует - ошибка 404."""
-    film = await service.get_film_work_by_id(film_id)
-    if not film:
+    film_work = await service.get_film_work_by_id(film_work_id=film_work_id)
+    if not film_work:
         raise HTTPException(
             status_code=HTTPStatus.NOT_FOUND,
             detail='Film was not found',
         )
-    return FullFilmWorkForResponse.parse_obj(film)
+    return FullFilmWorkForResponse.parse_obj(film_work)
 
 
 @router.get('', response_model=list[FilmWorkForResponse])
+@cache_result_of_handler(model=FilmWorkForResponse, many=True)
 async def get_film_works(
+        request: Request,
         service: FilmService = Depends(get_film_services),
         page_size: int = Query(config.DEFAULT_PAGE_SIZE, alias='page[size]', description='Размер страницы.'),
         page_number: int = Query(config.DEFAULT_PAGE_NUMBER, alias='page[number]', description='Номер страницы.'),
@@ -47,7 +53,9 @@ async def get_film_works(
 
 
 @router.get('/search/', response_model=list[FilmWorkForResponse])
+@cache_result_of_handler(model=FilmWorkForResponse, many=True)
 async def get_searched_film_works(
+        request: Request,
         service: FilmService = Depends(get_film_services),
         page_size: int = Query(config.DEFAULT_PAGE_SIZE, alias='page[size]', description='Размер страницы.'),
         page_number: int = Query(config.DEFAULT_PAGE_NUMBER, alias='page[number]', description='Номер страницы.'),

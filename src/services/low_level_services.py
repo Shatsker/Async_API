@@ -1,4 +1,7 @@
+import json
+
 from typing import Optional
+
 from abc import ABC
 
 from aioredis import Redis
@@ -9,7 +12,6 @@ from elasticsearch.exceptions import NotFoundError
 from fastapi.params import Depends
 from pydantic import BaseModel
 
-from db.redis import get_redis
 from db.elastic import get_elastic
 from core import config
 
@@ -19,20 +21,27 @@ from .base import BaseCacheService, BaseSearchService
 class RedisCacheService(BaseCacheService, ABC):
     """Сервис для кеширования данных в редис."""
 
-    def __init__(self, redis: Redis = Depends(get_redis)):
+    def __init__(self, redis: Redis):
         self.redis = redis
 
-    async def get_cache_by_id(self, cache_id: str, model) -> Optional[BaseModel]:
+    async def get_cache_by_id(self, cache_id: str, model: BaseModel, many: bool = False):
         """Получает кэш по id и парсит с помощью модели, затем возвращает объект модели."""
         cache = await self.redis.get(cache_id)
-        if cache:
-            return model.parse_raw(cache)
 
-    async def put_to_cache_by_id(self, model_for_caching: BaseModel):
+        if cache and not many:
+            return model.parse_raw(cache)
+        elif cache and many:
+            return [model.parse_raw(ch) for ch in json.loads(cache)]
+
+    async def put_to_cache_by_id(self, cache_id: str, cache: str or list, many: bool = False):
         """Добавляем фильм из elastic'а в кеш по его id."""
+        if many:
+            cache = json.dumps([ch.json() for ch in cache])
+        else:
+            cache = cache.json()
         await self.redis.set(
-            model_for_caching.id,
-            model_for_caching.json(),
+            cache_id,
+            cache,
             expire=config.FILM_CACHE_EXPIRE_IN_SECONDS,
         )
 
