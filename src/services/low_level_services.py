@@ -1,17 +1,15 @@
-from typing import Optional
 from abc import ABC
+from typing import Optional
 
 from aioredis import Redis
-
 from elasticsearch import AsyncElasticsearch
 from elasticsearch.exceptions import NotFoundError
-
 from fastapi.params import Depends
 from pydantic import BaseModel
 
-from db.redis import get_redis
-from db.elastic import get_elastic
 from core import config
+from db.elastic import get_elastic
+from db.redis import get_redis
 
 from .base import BaseCacheService, BaseSearchService
 
@@ -46,24 +44,34 @@ class ElasticSearchService(BaseSearchService, ABC):
 
     async def get_full_data_from_storage(
             self,
-            page_size: int,
-            page_number: int,
-            filter_by_nested: Optional[dict[str, str]],
-            index_of_docs: str,
-            sort: str,
             model,
+            index_of_docs: str,
+            page_size: int = None,
+            page_number: int = None,
+            sort: str = None,
+            filter_by_nested: dict[str, str] = None,
     ) -> Optional[list[BaseModel]]:
         """Достает все данные по модели из elastic'а,
            имеется пагинация, сортировка и фильтрация.
         """
+        from_ = None
+        body = None
+
+        if page_number is not None and page_size is not None:
+            from_ = self._get_page_offset_for_elastic(page_number, page_size)
+
+        if sort is not None:
+            sort = self._get_sort_for_elastic(sort)
+
+        if filter_by_nested is not None:
+            body = self._get_query_for_getting_fw_by_id_of_nested_object_in_elastic(filter_by_nested)
+
         documents = await self.elastic.search(
             index=index_of_docs,
             size=page_size,
-            from_=self._get_page_offset_for_elastic(page_number, page_size),
-            sort=self._get_sort_for_elastic(sort),
-            body=self._get_query_for_getting_fw_by_id_of_nested_object_in_elastic(
-                filter_by_nested
-            ) if filter_by_nested else None,
+            from_=from_,
+            sort=sort,
+            body=body,
         )
         return [model(**doc['_source']) for doc in documents['hits']['hits']]
 
@@ -88,10 +96,10 @@ class ElasticSearchService(BaseSearchService, ABC):
         )
         return [model(**doc['_source']) for doc in documents['hits']['hits']]
 
-    async def get_data_of_one_model_by_id_from_storage(self, model_id, model):
+    async def get_data_of_one_model_by_id_from_storage(self, index, model_id, model):
         """Возвращает объект переданной модели из elastic'а по id документа."""
         try:
-            document = await self.elastic.get('movies', model_id)
+            document = await self.elastic.get(index.value, model_id)
         except NotFoundError:
             return None
         else:

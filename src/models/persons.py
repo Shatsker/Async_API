@@ -1,6 +1,10 @@
-from pydantic import BaseModel
-
 from typing import Optional
+from uuid import UUID
+
+import orjson
+from pydantic import BaseModel, Field
+
+from core.utils import orjson_dumps
 
 
 class BasePerson(BaseModel):
@@ -9,10 +13,16 @@ class BasePerson(BaseModel):
     name: Optional[str]
 
 
-class Person(BasePerson):
+class Person(BaseModel):
     """Модель всех персон, вне зависимости от роли."""
-    role: list[str] = None
-    film_ids: list[str] = None
+    id: str
+    full_name: Optional[str]
+    roles: list[str] = []
+    film_ids: list[UUID] = []
+
+    class Config:
+        json_loads = orjson.loads
+        json_dumps = orjson_dumps
 
 
 class Actor(BasePerson):
@@ -34,3 +44,10 @@ class Writer(BasePerson):
        Сюда можно заносить какие-то специфичные для сценаристов поля.
     """
     pass
+
+
+class PersonResponse(BaseModel):
+    uuid: str = Field(..., alias='id')
+    full_name: Optional[str]
+    roles: list[str] = []
+    film_ids: list[UUID] = []
