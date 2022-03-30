@@ -55,7 +55,6 @@ class ElasticSearchService(BaseSearchService, ABC):
            имеется пагинация, сортировка и фильтрация.
         """
         from_ = None
-        sort = None
         body = None
 
         if page_number is not None and page_size is not None:
