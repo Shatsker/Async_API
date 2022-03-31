@@ -1,23 +1,28 @@
+from typing import Optional
+from uuid import UUID
+
 import orjson
-import datetime
+from pydantic import BaseModel, Field
 
-from pydantic import BaseModel
-
-
-def orjson_dumps(v, *, default):
-    return orjson.dumps(v, default = default).decode()
+from core.utils import orjson_dumps
 
 
 class BasePerson(BaseModel):
     """Базовая модель персоны в кинопроизведениях."""
     id: str
-    full_name: str
+    name: Optional[str]
 
 
-class Person(BasePerson):
+class Person(BaseModel):
     """Модель всех персон, вне зависимости от роли."""
-    role: str
-    film_ids: list[str] = None
+    id: str
+    full_name: Optional[str]
+    roles: list[str] = []
+    film_ids: list[UUID] = []
+
+    class Config:
+        json_loads = orjson.loads
+        json_dumps = orjson_dumps
 
 
 class Actor(BasePerson):
@@ -41,26 +46,11 @@ class Writer(BasePerson):
     pass
 
 
-class Genre(BaseModel):
-    """Модель жанров в кинопроизведениях."""
-    id: str
-    name: str
-
-
-class FilmWork(BaseModel):
-    """Базовая модель кинопроизведений."""
-    id: str
-    title: str
-    imdb_rating: float
-    description: str = None
-    type: str
-    creation_date: datetime.date
-    directors: list[Director]
-    actors: list[Actor]
-    writers: list[Writer]
-    genres: list[Genre]
-    file_path: str
+class PersonResponse(BaseModel):
+    uuid: str = Field(..., alias='id')
+    full_name: Optional[str]
+    roles: list[str] = []
+    film_ids: list[UUID] = []
 
     class Config:
-        json_loads = orjson.loads
-        json_dumps = orjson_dumps
+        allow_population_by_field_name = True

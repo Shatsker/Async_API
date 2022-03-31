@@ -6,7 +6,7 @@ import uvicorn
 from fastapi import FastAPI
 from fastapi.responses import ORJSONResponse
 
-from api.v1 import films
+from api.v1 import film_works, genres, persons
 from core import config
 from core.config import APP_HOST, APP_PORT
 from core.logger import LOGGING
@@ -16,13 +16,26 @@ app = FastAPI(
     title=config.PROJECT_NAME,
     docs_url='/api/openapi',
     openapi_url='/api/openapi.json',
-    # Можно заменить стандартный сериализатор на более шустрый, написанный на Rust
+    # Можно заменить стандартный сериализатор на более шустрый
     default_response_class=ORJSONResponse,
 )
+
 app.include_router(
-    films.router,
+    film_works.router,
     prefix='/api/v1/films',
     tags=['film'],
+)
+
+app.include_router(
+    persons.router,
+    prefix='/api/v1/persons',
+    tags=['persons'],
+)
+
+app.include_router(
+    genres.router,
+    prefix='/api/v1/genres',
+    tags=['genres'],
 )
 
 
@@ -51,4 +64,5 @@ if __name__ == '__main__':
         port=APP_PORT,
         log_config=LOGGING,
         log_level=logging.DEBUG,
+        reload=True
     )
