@@ -6,11 +6,11 @@ from fastapi.params import Depends
 
 from core import config
 from core.enums import ElasticIndexes
-from models.film_works import FilmWorkForResponse
+from models.film_works import FilmWorkResponse
 from models.persons import Person
 from services.base import BaseServicesMixin
 from services.film_works import get_film_service
-from services.low_level_services import ElasticSearchService, RedisCacheService
+from services.low_level_services import ElasticSearchService
 
 
 class PersonService(BaseServicesMixin):
@@ -39,7 +39,7 @@ class PersonService(BaseServicesMixin):
             model=Person
         )
 
-    async def get_person_film_works(self, person_uuid: UUID) -> list[FilmWorkForResponse]:
+    async def get_person_film_works(self, person_uuid: UUID) -> list[FilmWorkResponse]:
         """Возвращает фильмы по персоне (фильмы в которых участвует данная персона)"""
 
         film_works = []
@@ -54,18 +54,17 @@ class PersonService(BaseServicesMixin):
             return film_works
 
         # определено локально в методе чтобы не вызывать рекурсию зависимостей
-        film_service = get_film_service(redis=self.cache_service, elastic=self.search_service)
+        film_service = get_film_service(elastic=self.search_service)
 
         for film_id in person.film_ids:
             film = await film_service.get_film_work_by_id(str(film_id))
-            film_works.append(FilmWorkForResponse.parse_obj(film))
+            film_works.append(FilmWorkResponse.parse_obj(film))
 
         return film_works
 
 
 @lru_cache()
 def get_person_service(
-        redis: RedisCacheService = Depends(RedisCacheService),
         elastic: ElasticSearchService = Depends(ElasticSearchService),
 ):
-    return PersonService(redis, elastic)
+    return PersonService(elastic)

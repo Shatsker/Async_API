@@ -1,3 +1,5 @@
+import json
+
 from abc import ABC
 from typing import Optional
 
@@ -20,17 +22,34 @@ class RedisCacheService(BaseCacheService, ABC):
     def __init__(self, redis: Redis = Depends(get_redis)):
         self.redis = redis
 
-    async def get_cache_by_id(self, cache_id: str, model) -> Optional[BaseModel]:
+    async def get_cache_by_id(
+            self,
+            cache_id: str,
+            model,
+            many: bool = False
+    ) -> Optional[BaseModel] or Optional[list[BaseModel]]:
         """Получает кэш по id и парсит с помощью модели, затем возвращает объект модели."""
         cache = await self.redis.get(cache_id)
-        if cache:
+
+        if cache and not many:
             return model.parse_raw(cache)
 
-    async def put_to_cache_by_id(self, model_for_caching: BaseModel):
+        elif cache and many:
+            return [model.parse_raw(ch) for ch in json.loads(cache)]
+
+    async def put_to_cache_by_id(self, cache_id: str, cache_models, many: bool = False):
         """Добавляем фильм из elastic'а в кеш по его id."""
+        data_for_caching = None
+
+        if cache_models and many:
+            data_for_caching = json.dumps([ch.json() for ch in cache_models])
+
+        elif cache_models and not many:
+            data_for_caching = cache_models.json()
+
         await self.redis.set(
-            model_for_caching.id,
-            model_for_caching.json(),
+            cache_id,
+            data_for_caching,
             expire=config.FILM_CACHE_EXPIRE_IN_SECONDS,
         )
 
