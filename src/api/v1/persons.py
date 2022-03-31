@@ -17,7 +17,7 @@ router = APIRouter()
 
 
 @router.get('/search', response_model=list[PersonResponse], response_model_by_alias=False)
-@cache_result_of_handler(model=PersonResponse, many=True)
+@cache_result_of_handler(model=PersonResponse, expire=config.PERSON_CACHE_EXPIRE_IN_SECONDS, many=True)
 async def get_searched_persons(
         request: Request,
         service: PersonService = Depends(get_person_service),
@@ -35,7 +35,7 @@ async def get_searched_persons(
 
 
 @router.get('/{person_id}', response_model=PersonResponse, response_model_by_alias=False)
-@cache_result_of_handler(model=PersonResponse)
+@cache_result_of_handler(model=PersonResponse, expire=config.PERSON_CACHE_EXPIRE_IN_SECONDS)
 async def get_persons_by_id(
         request: Request,
         person_id: UUID = Path(..., description='UUID персоны'),
@@ -54,7 +54,7 @@ async def get_persons_by_id(
 
 
 @router.get('/{person_id}/film', response_model=list[FilmWorkResponse], response_model_by_alias=False)
-@cache_result_of_handler(model=FilmWorkResponse, many=True)
+@cache_result_of_handler(model=FilmWorkResponse, expire=config.PERSON_CACHE_EXPIRE_IN_SECONDS, many=True)
 async def get_persons_film_works(
         request: Request,
         person_id: UUID = Path(..., description='UUID персоны'),

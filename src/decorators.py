@@ -6,11 +6,12 @@ from services.low_level_services import RedisCacheService
 from db.redis import get_redis
 
 
-def cache_result_of_handler(model, many=False):
+def cache_result_of_handler(model, expire, many=False):
     """Декоратор для кеширования результата обработчика.
     Arguments:
         model: Pydantic-модель которую возвращает обработчик
         many: Передаётся список моделей, или одиночная модель
+        expire: Время жизни кеша
     Returns:
         Результат работы обработчика, или кеш этого же результата.
     """
@@ -33,6 +34,7 @@ def cache_result_of_handler(model, many=False):
                 await cache_service.put_to_cache_by_id(
                     cache_id=key_for_cache,
                     cache_models=data_from_handler,
+                    expire=expire,
                     many=many,
                 )
                 return data_from_handler

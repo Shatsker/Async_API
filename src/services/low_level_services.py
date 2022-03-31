@@ -37,7 +37,13 @@ class RedisCacheService(BaseCacheService, ABC):
         elif cache and many:
             return [model.parse_raw(ch) for ch in json.loads(cache)]
 
-    async def put_to_cache_by_id(self, cache_id: str, cache_models, many: bool = False):
+    async def put_to_cache_by_id(
+            self,
+            cache_id: str,
+            cache_models,
+            expire: str,
+            many: bool = False
+    ):
         """Добавляем фильм из elastic'а в кеш по его id."""
         data_for_caching = None
 
@@ -50,7 +56,7 @@ class RedisCacheService(BaseCacheService, ABC):
         await self.redis.set(
             cache_id,
             data_for_caching,
-            expire=config.FILM_CACHE_EXPIRE_IN_SECONDS,
+            expire=expire,
         )
 
 

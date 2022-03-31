@@ -15,7 +15,7 @@ router = APIRouter()
 
 
 @router.get('/{film_id}', response_model=FullFilmWorkResponse, response_model_by_alias=False)
-@cache_result_of_handler(model=FullFilmWorkResponse)
+@cache_result_of_handler(model=FullFilmWorkResponse, expire=config.FILM_CACHE_EXPIRE_IN_SECONDS)
 async def get_film_by_id(
         request: Request,
         film_id: str,
@@ -34,7 +34,7 @@ async def get_film_by_id(
 
 
 @router.get('', response_model=list[FilmWorkResponse], response_model_by_alias=False)
-@cache_result_of_handler(model=FilmWorkResponse, many=True)
+@cache_result_of_handler(model=FilmWorkResponse, expire=config.FILM_CACHE_EXPIRE_IN_SECONDS, many=True)
 async def get_film_works(
         request: Request,
         service: FilmService = Depends(get_film_service),
@@ -54,7 +54,7 @@ async def get_film_works(
 
 
 @router.get('/search/', response_model=list[FilmWorkResponse], response_model_by_alias=False)
-@cache_result_of_handler(model=FilmWorkResponse, many=True)
+@cache_result_of_handler(model=FilmWorkResponse, many=True, expire=config.FILM_CACHE_EXPIRE_IN_SECONDS)
 async def get_searched_film_works(
         request: Request,
         service: FilmService = Depends(get_film_service),

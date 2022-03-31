@@ -7,6 +7,7 @@ from fastapi.params import Depends
 from fastapi.routing import APIRouter
 from fastapi.requests import Request
 
+from core import config
 from decorators import cache_result_of_handler
 from models.genres import GenreResponse
 from services.genres import GenreService, get_genre_service
@@ -15,7 +16,7 @@ router = APIRouter()
 
 
 @router.get('/{genre_id}', response_model=GenreResponse, response_model_by_alias=False)
-@cache_result_of_handler(model=GenreResponse)
+@cache_result_of_handler(model=GenreResponse, expire=config.GENRE_CACHE_EXPIRE_IN_SECONDS)
 async def get_genre_by_id(
         request: Request,
         genre_id: UUID,
@@ -33,7 +34,7 @@ async def get_genre_by_id(
 
 
 @router.get('', response_model=list[GenreResponse], response_model_by_alias=False)
-@cache_result_of_handler(model=GenreResponse, many=True)
+@cache_result_of_handler(model=GenreResponse, expire=config.GENRE_CACHE_EXPIRE_IN_SECONDS, many=True)
 async def get_genres(
         request: Request,
         service: GenreService = Depends(get_genre_service),
