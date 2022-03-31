@@ -43,9 +43,7 @@ class BaseSearchService(ABC):
 
 
 class BaseServicesMixin:
-    """Миксин с кешем и поиском."""
+    """Миксин с поиском."""
 
-    def __init__(self, cache_service: BaseCacheService, search_service: BaseSearchService):
-        """Инициализируем клиенты кеша и хранилища."""
-        self.cache_service = cache_service
+    def __init__(self, search_service: BaseSearchService):
         self.search_service = search_service

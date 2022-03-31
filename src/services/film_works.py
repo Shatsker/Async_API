@@ -8,7 +8,7 @@ from core.enums import ElasticIndexes, NestedObjectsFilter
 from models.film_works import FilmWork
 
 from .base import BaseServicesMixin
-from .low_level_services import ElasticSearchService, RedisCacheService
+from .low_level_services import ElasticSearchService
 
 
 class FilmService(BaseServicesMixin):
@@ -56,25 +56,15 @@ class FilmService(BaseServicesMixin):
         """Возвращает фильм по id из кеша, или из хранилища.
            Если фильма нет - возвращает None.
         """
-        film_work = await self.cache_service.get_cache_by_id(film_work_id, model=FilmWork)
-
-        if not film_work:
-            film_work = await self.search_service.get_data_of_one_model_by_id_from_storage(
-                index=ElasticIndexes.MOVIES,
-                model_id=film_work_id,
-                model=FilmWork,
-            )
-            if not film_work:
-                return None
-
-            await self.cache_service.put_to_cache_by_id(model_for_caching=film_work)
-
-        return film_work
+        return await self.search_service.get_data_of_one_model_by_id_from_storage(
+            index=ElasticIndexes.MOVIES,
+            model_id=film_work_id,
+            model=FilmWork,
+        )
 
 
 @lru_cache()
 def get_film_service(
-        redis: RedisCacheService = Depends(RedisCacheService),
         elastic: ElasticSearchService = Depends(ElasticSearchService),
 ):
-    return FilmService(redis, elastic)
+    return FilmService(elastic)

@@ -51,3 +51,6 @@ class PersonResponse(BaseModel):
     full_name: Optional[str]
     roles: list[str] = []
     film_ids: list[UUID] = []
+
+    class Config:
+        allow_population_by_field_name = True

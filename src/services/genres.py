@@ -7,7 +7,7 @@ from fastapi.params import Depends
 from core.enums import ElasticIndexes
 from models.genres import Genre
 from services.base import BaseServicesMixin
-from services.low_level_services import ElasticSearchService, RedisCacheService
+from services.low_level_services import ElasticSearchService
 
 
 class GenreService(BaseServicesMixin):
@@ -30,7 +30,6 @@ class GenreService(BaseServicesMixin):
 
 @lru_cache()
 def get_genre_service(
-        redis: RedisCacheService = Depends(RedisCacheService),
         elastic: ElasticSearchService = Depends(ElasticSearchService),
 ):
-    return GenreService(redis, elastic)
+    return GenreService(elastic)
