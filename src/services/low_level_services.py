@@ -1,6 +1,5 @@
 import json
 
-from abc import ABC
 from typing import Optional
 
 from aioredis import Redis
@@ -9,14 +8,13 @@ from elasticsearch.exceptions import NotFoundError
 from fastapi.params import Depends
 from pydantic import BaseModel
 
-from core import config
 from db.elastic import get_elastic
 from db.redis import get_redis
 
 from .base import BaseCacheService, BaseSearchService
 
 
-class RedisCacheService(BaseCacheService, ABC):
+class RedisCacheService(BaseCacheService):
     """Сервис для кеширования данных в редис."""
 
     def __init__(self, redis: Redis = Depends(get_redis)):
@@ -31,11 +29,13 @@ class RedisCacheService(BaseCacheService, ABC):
         """Получает кэш по id и парсит с помощью модели, затем возвращает объект модели."""
         cache = await self.redis.get(cache_id)
 
-        if cache and not many:
-            return model.parse_raw(cache)
+        if not cache:
+            return
 
-        elif cache and many:
+        if many:
             return [model.parse_raw(ch) for ch in json.loads(cache)]
+
+        return model.parse_raw(cache)
 
     async def put_to_cache_by_id(
             self,
@@ -60,7 +60,7 @@ class RedisCacheService(BaseCacheService, ABC):
         )
 
 
-class ElasticSearchService(BaseSearchService, ABC):
+class ElasticSearchService(BaseSearchService):
     """Сервис для получения данных из Elastic'а."""
 
     def __init__(self, elastic: AsyncElasticsearch = Depends(get_elastic)):

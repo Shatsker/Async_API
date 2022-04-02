@@ -1,12 +1,15 @@
 from http import HTTPStatus
 from typing import Optional
+from uuid import UUID
 
 from fastapi.exceptions import HTTPException
-from fastapi.params import Depends, Query
+from fastapi.params import Depends, Query, Path
 from fastapi.routing import APIRouter
 from fastapi.requests import Request
 
-from core import config
+from pydantic import parse_obj_as
+
+from core.config import settings
 from decorators import cache_result_of_handler
 from models.film_works import FilmWorkResponse, FullFilmWorkResponse
 from services.film_works import FilmService, get_film_service
@@ -14,34 +17,34 @@ from services.film_works import FilmService, get_film_service
 router = APIRouter()
 
 
-@router.get('/{film_id}', response_model=FullFilmWorkResponse, response_model_by_alias=False)
-@cache_result_of_handler(model=FullFilmWorkResponse, expire=config.FILM_CACHE_EXPIRE_IN_SECONDS)
+@router.get('/{film_work_id}', response_model=FullFilmWorkResponse, response_model_by_alias=False)
+@cache_result_of_handler(model=FullFilmWorkResponse, expire=settings.film_cache_expire_in_seconds)
 async def get_film_by_id(
         request: Request,
-        film_id: str,
+        film_work_id: UUID = Path(..., description='UUID кинопроизведения.'),
         service: FilmService = Depends(get_film_service),
 ) -> Optional[FullFilmWorkResponse]:
     """Получение кинопроизведения по id, если фильм отсутствует - ошибка 404."""
-    film = await service.get_film_work_by_id(film_id)
+    film_work = await service.get_film_work_by_id(film_work_id)
 
-    if not film:
+    if not film_work:
         raise HTTPException(
             status_code=HTTPStatus.NOT_FOUND,
             detail='Film was not found',
         )
 
-    return FullFilmWorkResponse.parse_obj(film)
+    return FullFilmWorkResponse.parse_obj(film_work)
 
 
 @router.get('', response_model=list[FilmWorkResponse], response_model_by_alias=False)
-@cache_result_of_handler(model=FilmWorkResponse, expire=config.FILM_CACHE_EXPIRE_IN_SECONDS, many=True)
+@cache_result_of_handler(model=FilmWorkResponse, expire=settings.film_cache_expire_in_seconds, many=True)
 async def get_film_works(
         request: Request,
         service: FilmService = Depends(get_film_service),
-        page_size: int = Query(config.DEFAULT_PAGE_SIZE, alias='page[size]', description='Размер страницы.'),
-        page_number: int = Query(config.DEFAULT_PAGE_NUMBER, alias='page[number]', description='Номер страницы.'),
+        page_size: int = Query(settings.default_page_size, alias='page[size]', description='Размер страницы.'),
+        page_number: int = Query(settings.default_page_number, alias='page[number]', description='Номер страницы.'),
         filter_genre: str = Query(None, alias='filter[genre]', description='Сортировка по жанрам'),
-        sort: str = Query(config.DEFAULT_SORT_FOR_FILMWORKS, description='Сортировка по полю фильма.'),
+        sort: str = Query(settings.default_sort_for_filmwork, description='Сортировка по полю фильма.'),
 ) -> list[Optional[FilmWorkResponse]]:
     """Обработчик запроса всех фильмов - с сортировкой, фильтрацией и тд."""
     film_works = await service.get_film_works_from_storage_or_cache(
@@ -50,16 +53,16 @@ async def get_film_works(
         filter_genre=filter_genre,
         sort=sort,
     )
-    return [FilmWorkResponse.parse_obj(fw) for fw in film_works]
+    return parse_obj_as(list[FilmWorkResponse], film_works)
 
 
 @router.get('/search/', response_model=list[FilmWorkResponse], response_model_by_alias=False)
-@cache_result_of_handler(model=FilmWorkResponse, many=True, expire=config.FILM_CACHE_EXPIRE_IN_SECONDS)
+@cache_result_of_handler(model=FilmWorkResponse, many=True, expire=settings.film_cache_expire_in_seconds)
 async def get_searched_film_works(
         request: Request,
         service: FilmService = Depends(get_film_service),
-        page_size: int = Query(config.DEFAULT_PAGE_SIZE, alias='page[size]', description='Размер страницы.'),
-        page_number: int = Query(config.DEFAULT_PAGE_NUMBER, alias='page[number]', description='Номер страницы.'),
+        page_size: int = Query(settings.default_page_size, alias='page[size]', description='Размер страницы.'),
+        page_number: int = Query(settings.default_page_number, alias='page[number]', description='Номер страницы.'),
         search_query: str = Query(None, alias='query', description='Поиск по кинопроизведениям.'),
 ) -> list[Optional[FilmWorkResponse]]:
     """Обработчик запроса на поиск по фильмам.
@@ -70,4 +73,4 @@ async def get_searched_film_works(
         page_number=page_number,
         search_query=search_query,
     )
-    return [FilmWorkResponse.parse_obj(fw) for fw in film_works]
+    return parse_obj_as(list[FilmWorkResponse], film_works)

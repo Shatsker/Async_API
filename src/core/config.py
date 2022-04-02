@@ -1,34 +1,43 @@
 import os
+
 from logging import config as logging_config
 
-from dotenv import load_dotenv
+from pydantic import BaseSettings
 
 from core.logger import LOGGING
 
-load_dotenv()
+
 logging_config.dictConfig(LOGGING)
 
-PROJECT_NAME = os.getenv('PROJECT_NAME', 'shatsker_movies')
 
-APP_HOST = os.getenv('APP_HOST', '0.0.0.0')
-APP_PORT = int(os.getenv('APP_PORT', 8000))
+class Settings(BaseSettings):
+    """Настройки проекта."""
+    project_name: str = 'movies'
 
-REDIS_HOST = os.getenv('REDIS_HOST', '127.0.0.1')
-REDIS_PORT = int(os.getenv('REDIS_PORT', 6379))
+    app_host: str = '0.0.0.0'
+    app_port: int = 8000
 
-FILM_CACHE_EXPIRE_IN_SECONDS = os.getenv('FILM_CACHE_EXPIRE_IN_SECONDS', 15 * 60)
-PERSON_CACHE_EXPIRE_IN_SECONDS = os.getenv('PERSON_CACHE_EXPIRE_IN_SECONDS', 15 * 60)
-GENRE_CACHE_EXPIRE_IN_SECONDS = os.getenv('GENRE_CACHE_EXPIRE_IN_SECONDS', 15 * 60)
+    redis_host: str = '127.0.0.1'
+    redis_port: int = 6379
+
+    film_cache_expire_in_seconds: int = 15 * 60
+    person_cache_expire_in_seconds: int = 15 * 60
+    genre_cache_expire_in_seconds: int = 15 * 60
+
+    elastic_host: str = '127.0.0.1'
+    elastic_port: int = 9200
+
+    base_dir: str = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+    default_page_size: int = 10
+    default_page_number: int = 1
+    default_sort_for_filmwork: str = 'imdb_rating'
+
+    fields_for_searching_filmworks: list[str] = ['title', 'description', 'genre', 'actors_names', 'writers_names']
+    fields_for_searching_persons: list[str] = ['full_name', ]
 
 
-ELASTIC_HOST = os.getenv('ELASTIC_HOST', '127.0.0.1')
-ELASTIC_PORT = int(os.getenv('ELASTIC_PORT', 9200))
-
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
-DEFAULT_PAGE_SIZE = 10
-DEFAULT_PAGE_NUMBER = 1
-DEFAULT_SORT_FOR_FILMWORKS = 'imdb_rating'
-
-FIELDS_FOR_SEARCHING_FILMWORK = ['title', 'description', 'genre', 'actors_names', 'writers_names']
-FIELDS_FOR_SEARCHING_PERSONS = ['full_name', ]
+settings = Settings(
+    _env_file='.env',
+    _env_file_encoding='utf8',
+)
