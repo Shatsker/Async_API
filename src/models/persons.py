@@ -1,28 +1,23 @@
 from typing import Optional
 from uuid import UUID
 
-import orjson
-from pydantic import BaseModel, Field
+from pydantic import Field
 
-from core.utils import orjson_dumps
+from .base import BaseModelConfig, MixinAllowPopulation
 
 
-class BasePerson(BaseModel):
+class BasePerson(BaseModelConfig):
     """Базовая модель персоны в кинопроизведениях."""
     id: str
     name: Optional[str]
 
 
-class Person(BaseModel):
+class Person(BaseModelConfig):
     """Модель всех персон, вне зависимости от роли."""
     id: str
     full_name: Optional[str]
     roles: list[str] = []
     film_ids: list[UUID] = []
-
-    class Config:
-        json_loads = orjson.loads
-        json_dumps = orjson_dumps
 
 
 class Actor(BasePerson):
@@ -46,11 +41,8 @@ class Writer(BasePerson):
     pass
 
 
-class PersonResponse(BaseModel):
+class PersonResponse(BaseModelConfig, MixinAllowPopulation):
     uuid: str = Field(..., alias='id')
     full_name: Optional[str]
     roles: list[str] = []
     film_ids: list[UUID] = []
-
-    class Config:
-        allow_population_by_field_name = True

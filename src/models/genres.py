@@ -1,18 +1,14 @@
-from typing import Optional
+from pydantic import Field
 
-from pydantic import BaseModel, Field
+from .base import BaseModelConfig, MixinAllowPopulation
 
 
-class Genre(BaseModel):
+class Genre(BaseModelConfig):
     """Модель жанров в кинопроизведениях."""
     id: str
     name: str
 
 
-class GenreResponse(BaseModel):
+class GenreResponse(BaseModelConfig, MixinAllowPopulation):
     uuid: str = Field(..., alias='id')
     name: str
-    description: Optional[str]
-
-    class Config:
-        allow_population_by_field_name = True
