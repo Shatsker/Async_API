@@ -7,13 +7,12 @@ from fastapi import FastAPI
 from fastapi.responses import ORJSONResponse
 
 from api.v1 import film_works, genres, persons
-from core import config
-from core.config import APP_HOST, APP_PORT
+from core.config import settings
 from core.logger import LOGGING
 from db import elastic, redis
 
 app = FastAPI(
-    title=config.PROJECT_NAME,
+    title=settings.project_name,
     docs_url='/api/openapi',
     openapi_url='/api/openapi.json',
     # Можно заменить стандартный сериализатор на более шустрый
@@ -42,12 +41,12 @@ app.include_router(
 @app.on_event('startup')
 async def startup():
     redis.redis = await aioredis.create_redis_pool(
-        (config.REDIS_HOST, config.REDIS_PORT),
+        (settings.redis_host, settings.redis_port),
         minsize=10,
         maxsize=20,
     )
     elastic.es = elasticsearch.AsyncElasticsearch(
-        hosts=[f'{config.ELASTIC_HOST}:{config.ELASTIC_PORT}'],
+        hosts=[f'{settings.elastic_host}:{settings.elastic_port}'],
     )
 
 
@@ -60,8 +59,8 @@ async def shutdown():
 if __name__ == '__main__':
     uvicorn.run(
         app='main:app',
-        host=APP_HOST,
-        port=APP_PORT,
+        host=settings.app_host,
+        port=settings.app_port,
         log_config=LOGGING,
         log_level=logging.DEBUG,
         reload=True

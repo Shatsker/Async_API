@@ -11,6 +11,6 @@ services:
       - redis
 
   redis:
-    image: "redis:alpine"
+    image: "redis:3.2.0-alpine"
     ports:
       - "6379:6379"

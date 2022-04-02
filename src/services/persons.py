@@ -4,7 +4,7 @@ from uuid import UUID
 
 from fastapi.params import Depends
 
-from core import config
+from core.config import settings
 from core.enums import ElasticIndexes
 from models.film_works import FilmWorkResponse
 from models.persons import Person
@@ -29,7 +29,7 @@ class PersonService(BaseServicesMixin):
             page_number=page_number,
             search_query=search_query,
             index_of_docs=ElasticIndexes.PERSONS.value,
-            fields_for_searching=config.FIELDS_FOR_SEARCHING_PERSONS,
+            fields_for_searching=settings.fields_for_searching_persons,
         )
 
     async def get_person_by_uuid(self, uuid: UUID) -> Optional[Person]:

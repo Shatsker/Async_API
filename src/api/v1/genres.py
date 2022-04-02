@@ -7,7 +7,9 @@ from fastapi.params import Depends
 from fastapi.routing import APIRouter
 from fastapi.requests import Request
 
-from core import config
+from pydantic import parse_obj_as
+
+from core.config import settings
 from decorators import cache_result_of_handler
 from models.genres import GenreResponse
 from services.genres import GenreService, get_genre_service
@@ -16,7 +18,7 @@ router = APIRouter()
 
 
 @router.get('/{genre_id}', response_model=GenreResponse, response_model_by_alias=False)
-@cache_result_of_handler(model=GenreResponse, expire=config.GENRE_CACHE_EXPIRE_IN_SECONDS)
+@cache_result_of_handler(model=GenreResponse, expire=settings.genre_cache_expire_in_seconds)
 async def get_genre_by_id(
         request: Request,
         genre_id: UUID,
@@ -34,7 +36,7 @@ async def get_genre_by_id(
 
 
 @router.get('', response_model=list[GenreResponse], response_model_by_alias=False)
-@cache_result_of_handler(model=GenreResponse, expire=config.GENRE_CACHE_EXPIRE_IN_SECONDS, many=True)
+@cache_result_of_handler(model=GenreResponse, expire=settings.genre_cache_expire_in_seconds, many=True)
 async def get_genres(
         request: Request,
         service: GenreService = Depends(get_genre_service),
@@ -42,4 +44,4 @@ async def get_genres(
     """Обработчик запроса всех жанров."""
     genres = await service.get_genres()
 
-    return [GenreResponse.parse_obj(g) for g in genres]
+    return parse_obj_as(list[GenreResponse], genres)

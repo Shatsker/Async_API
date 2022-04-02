@@ -1,9 +1,10 @@
 from functools import lru_cache
 from typing import Optional
+from uuid import UUID
 
 from fastapi import Depends
 
-from core import config
+from core.config import settings
 from core.enums import ElasticIndexes, NestedObjectsFilter
 from models.film_works import FilmWork
 
@@ -49,10 +50,10 @@ class FilmService(BaseServicesMixin):
             page_number=page_number,
             search_query=search_query,
             index_of_docs=ElasticIndexes.MOVIES.value,
-            fields_for_searching=config.FIELDS_FOR_SEARCHING_FILMWORK,
+            fields_for_searching=settings.fields_for_searching_filmworks,
         )
 
-    async def get_film_work_by_id(self, film_work_id: str) -> Optional[FilmWork]:
+    async def get_film_work_by_id(self, film_work_id: UUID) -> Optional[FilmWork]:
         """Возвращает фильм по id из кеша, или из хранилища.
            Если фильма нет - возвращает None.
         """
