@@ -22,4 +22,6 @@ RUN   \
 # copy project
 COPY ./src /app
 
-CMD python3 main.py
+
+
+CMD gunicorn main:app  --bind 0.0.0.0:8000 --worker-class uvicorn.workers.UvicornWorker
