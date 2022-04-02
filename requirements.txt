@@ -3,6 +3,7 @@ elasticsearch[async]==7.10.0
 fastapi==0.75.0
 orjson==3.6.7
 pydantic==1.9.0
-uvicorn==0.17.6
+uvicorn[standard]==0.17.6
 uvloop==0.16.0
 python-dotenv==0.19
+gunicorn==20.1
