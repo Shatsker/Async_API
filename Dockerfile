@@ -18,10 +18,7 @@ RUN   \
      python3 -m pip install -r /app/requirements.txt --no-cache-dir &&  \
      apk --purge del .build-deps
 
-
 # copy project
-COPY ./src /app
+COPY . /app
 
-
-
-CMD gunicorn main:app  --bind 0.0.0.0:8000 --worker-class uvicorn.workers.UvicornWorker
+CMD cd src/ && gunicorn main:app  --bind 0.0.0.0:8000 --worker-class uvicorn.workers.UvicornWorker
