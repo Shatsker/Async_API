@@ -1,0 +1,33 @@
+version: '3.9'
+
+services:
+  app:
+    build: ../../.
+    image: fastapi_image
+    env_file:
+      - ../../src/.env
+    ports:
+      - "8000:8000"
+    depends_on:
+      - redis
+      - elastic
+  redis:
+    image: "redis:3.2.0-alpine"
+    ports:
+      - "6379:6379"
+  elastic:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.7.0
+    ports:
+      - "9200:9200"
+    environment:
+      - "discovery.type=single-node"
+  tests:
+    image: fastapi_image
+    depends_on:
+      - app
+    env_file:
+      - ../../src/.env
+    entrypoint: >
+      sh -c "python3 tests/functional/wait_for_redis.py
+      && python3 tests/functional/wait_for_es.py
+      && pytest --tb=native tests/functional/src"
