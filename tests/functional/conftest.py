@@ -22,7 +22,7 @@ class HttpResponse:
 @pytest.fixture(scope='session')
 async def es_client():
     client = AsyncElasticsearch(
-        hosts=(f'{test_settings.elastic_host}:{test_settings.elastic_port}', )
+        hosts=(f'{test_settings.elastic_host}:{test_settings.elastic_port}',)
     )
     yield client
     await client.close()
@@ -39,20 +39,14 @@ async def redis_client():
     client.close()
 
 
-@pytest.fixture(scope='session')
-async def session():
-    session = aiohttp.ClientSession()
-    yield session
-    await session.close()
-
-
 @pytest.fixture
-def make_request(session):
+def make_request():  # fixme: переименовать в make_get_request либо добавить поддержку других методов
     async def inner(method: str, params: Optional[dict] = None) -> HttpResponse:
         params = params or {}
         url = SERVICE_URL + test_settings.api_v1_prefix + method
 
-        async with session.get(url=url, params=params) as response:
+        async with aiohttp.ClientSession() as session:
+            response = await session.get(url=url, params=params)
             return HttpResponse(
                 body=await response.json(),
                 headers=response.headers,
