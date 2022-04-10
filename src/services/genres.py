@@ -18,6 +18,8 @@ class GenreService(BaseServicesMixin):
         return await self.search_service.get_full_data_from_storage(
             model=Genre,
             index_of_docs=ElasticIndexes.GENRES.value,
+            page_size=500,
+            sort='id'
         )
 
     async def get_genre_by_uuid(self, uuid: UUID) -> Optional[Genre]:
