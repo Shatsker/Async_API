@@ -41,7 +41,5 @@ async def test_get_genre_by_id_handler(
 ):
     response = await make_request(**inp_params)
     data = response.body
-    print(data)
 
     assert data == should_be
-    print(1)
