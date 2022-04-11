@@ -9,8 +9,7 @@ from pydantic import BaseModel
 
 from db.elastic import get_elastic
 from db.redis import get_redis
-
-from .base import BaseCacheService, BaseSearchService
+from services.base import BaseCacheService, BaseSearchService
 
 
 class RedisCacheService(BaseCacheService):
@@ -44,12 +43,10 @@ class RedisCacheService(BaseCacheService):
             many: bool = False
     ):
         """Добавляем фильм из elastic'а в кеш по его id."""
-        data_for_caching = None
 
-        if cache_models and many:
+        if many:
             data_for_caching = json.dumps([ch.json() for ch in cache_models])
-
-        elif cache_models and not many:
+        else:
             data_for_caching = cache_models.json()
 
         await self.redis.set(
