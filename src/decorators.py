@@ -2,11 +2,11 @@ from functools import wraps
 
 from fastapi.requests import Request
 
-from services.low_level_services import RedisCacheService
 from db.redis import get_redis
+from services.low_level_services import RedisCacheService
 
 
-def cache_result_of_handler(model, expire, many=False):
+def cache_result_of_handler(model, expire: int, many=False):
     """Декоратор для кеширования результата обработчика.
     Arguments:
         model: Pydantic-модель которую возвращает обработчик
