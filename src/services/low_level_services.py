@@ -39,7 +39,7 @@ class RedisCacheService(BaseCacheService):
             self,
             cache_id: str,
             cache_models,
-            expire: str,
+            expire: int,
             many: bool = False
     ):
         """Добавляем фильм из elastic'а в кеш по его id."""
@@ -52,7 +52,7 @@ class RedisCacheService(BaseCacheService):
         await self.redis.set(
             cache_id,
             data_for_caching,
-            expire=expire,
+            ex=expire,
         )
 
 

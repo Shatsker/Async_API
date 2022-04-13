@@ -2,11 +2,11 @@ import json
 from uuid import UUID
 
 import pytest
-from functional.conftest import SERVICE_URL
-from functional.settings import test_settings
+from tests.functional.conftest import SERVICE_URL
+from tests.functional.settings import test_settings
 
-from models.film_works import FilmWorkResponse
-from models.persons import PersonResponse
+from src.models.film_works import FilmWorkResponse
+from src.models.persons import PersonResponse
 
 pytestmark = pytest.mark.asyncio
 
@@ -44,16 +44,16 @@ pytestmark = pytest.mark.asyncio
 )
 async def test_search_person_handler(
         case, inp_params, should_be,
-        es_client, redis_client, make_request
+        es_client, redis_client, make_get_request
 ):
-    response = await make_request(**inp_params)
+    response = await make_get_request(**inp_params)
     data = response.body
 
     assert data == should_be
 
 
 async def test_search_person_with_redis_handler(
-        es_client, redis_client, make_request
+        es_client, redis_client, make_get_request
 ):
     should_be = [
         PersonResponse(
@@ -64,10 +64,10 @@ async def test_search_person_with_redis_handler(
     ]
 
     # кидаем запрос и ждем что ответ окажется в redis
-    await make_request(method='/persons/search?query=captain')
+    await make_get_request(method='/persons/search?query=captain')
 
     redis_data = await redis_client.get(
-        key=f'{SERVICE_URL}{test_settings.api_v1_prefix}/persons/search?query=captain',
+        name=f'{SERVICE_URL}{test_settings.api_v1_prefix}/persons/search?query=captain',
     )
 
     redis_data = [PersonResponse.parse_raw(ch) for ch in json.loads(redis_data)]
@@ -106,16 +106,16 @@ async def test_search_person_with_redis_handler(
 )
 async def test_get_persons_by_id_handler(
         case, inp_params, should_be,
-        es_client, redis_client, make_request
+        es_client, redis_client, make_get_request
 ):
-    response = await make_request(**inp_params)
+    response = await make_get_request(**inp_params)
     data = response.body
 
     assert data == should_be
 
 
 async def test_get_persons_by_id_with_redis_handler(
-        es_client, redis_client, make_request
+        es_client, redis_client, make_get_request
 ):
     should_be = PersonResponse(
         uuid='e65bfab5-6589-43cd-a48a-24d26b53a2be',
@@ -124,10 +124,10 @@ async def test_get_persons_by_id_with_redis_handler(
     )
 
     # кидаем запрос и ждем что ответ окажется в redis
-    await make_request(method='/persons/e65bfab5-6589-43cd-a48a-24d26b53a2be')
+    await make_get_request(method='/persons/e65bfab5-6589-43cd-a48a-24d26b53a2be')
 
     redis_data = await redis_client.get(
-        key=f'{SERVICE_URL}{test_settings.api_v1_prefix}/persons/e65bfab5-6589-43cd-a48a-24d26b53a2be',
+        name=f'{SERVICE_URL}{test_settings.api_v1_prefix}/persons/e65bfab5-6589-43cd-a48a-24d26b53a2be',
     )
 
     redis_data = PersonResponse.parse_raw(redis_data)
@@ -163,16 +163,16 @@ async def test_get_persons_by_id_with_redis_handler(
 )
 async def test_get_persons_film_works_handler(
         case, inp_params, should_be,
-        es_client, redis_client, make_request
+        es_client, redis_client, make_get_request
 ):
-    response = await make_request(**inp_params)
+    response = await make_get_request(**inp_params)
     data = response.body
 
     assert data == should_be
 
 
 async def test_get_persons_film_works_with_redis_handler(
-        es_client, redis_client, make_request
+        es_client, redis_client, make_get_request
 ):
     should_be = [
         FilmWorkResponse(
@@ -182,10 +182,10 @@ async def test_get_persons_film_works_with_redis_handler(
     ]
 
     # кидаем запрос и ждем что ответ окажется в redis
-    await make_request(method='/persons/e65bfab5-6589-43cd-a48a-24d26b53a2be/film')
+    await make_get_request(method='/persons/e65bfab5-6589-43cd-a48a-24d26b53a2be/film')
 
     redis_data = await redis_client.get(
-        key=f'{SERVICE_URL}{test_settings.api_v1_prefix}/persons/e65bfab5-6589-43cd-a48a-24d26b53a2be/film',
+        name=f'{SERVICE_URL}{test_settings.api_v1_prefix}/persons/e65bfab5-6589-43cd-a48a-24d26b53a2be/film',
     )
 
     redis_data = [FilmWorkResponse.parse_raw(ch) for ch in json.loads(redis_data)]

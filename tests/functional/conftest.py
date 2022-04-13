@@ -1,9 +1,10 @@
+import asyncio
 from dataclasses import dataclass
 from typing import Optional
 
 import aiohttp
+import aioredis
 import pytest
-from aioredis import create_redis_pool
 from elasticsearch import AsyncElasticsearch
 from multidict import CIMultiDictProxy
 
@@ -19,6 +20,11 @@ class HttpResponse:
     status: int
 
 
+@pytest.fixture(scope="session")
+def event_loop():
+    return asyncio.get_event_loop()
+
+
 @pytest.fixture(scope='session')
 async def es_client():
     client = AsyncElasticsearch(
@@ -30,22 +36,22 @@ async def es_client():
 
 @pytest.fixture(scope='session')
 async def redis_client():
-    client = await create_redis_pool(
-        (test_settings.redis_host, test_settings.redis_port),
-        minsize=10,
-        maxsize=20,
+    client = aioredis.from_url(
+        url=f'redis://{test_settings.redis_host}',
+        encoding="utf-8",
     )
     yield client
-    client.close()
+    await client.close()
 
 
 @pytest.fixture
-def make_request():  # fixme: переименовать в make_get_request либо добавить поддержку других методов
+def make_get_request():
     async def inner(method: str, params: Optional[dict] = None) -> HttpResponse:
         params = params or {}
         url = SERVICE_URL + test_settings.api_v1_prefix + method
+        connector = aiohttp.TCPConnector(limit=10)
 
-        async with aiohttp.ClientSession() as session:
+        async with aiohttp.ClientSession(connector=connector) as session:
             response = await session.get(url=url, params=params)
             return HttpResponse(
                 body=await response.json(),
