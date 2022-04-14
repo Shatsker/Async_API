@@ -32,6 +32,6 @@ class GenreService(BaseServicesMixin):
 
 @lru_cache()
 def get_genre_service(
-        elastic: ElasticSearchService = Depends(ElasticSearchService),
+        search_service: ElasticSearchService = Depends(ElasticSearchService),
 ):
-    return GenreService(elastic)
+    return GenreService(search_service)
