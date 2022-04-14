@@ -40,13 +40,13 @@ ALL_FILM_WORKS = [
         "imdb_rating": 2.1
     },
     {
-        "uuid": "5c855467-9c2b-491d-a179-c217ea543e93",
-        "title": "Porn Star Zombies",
+        "uuid": "e60412c9-43d2-48c0-94a1-81c6b04af84e",
+        "title": "Confessions of an Action Star",
         "imdb_rating": 2.4
     },
     {
-        "uuid": "e60412c9-43d2-48c0-94a1-81c6b04af84e",
-        "title": "Confessions of an Action Star",
+        "uuid": "5c855467-9c2b-491d-a179-c217ea543e93",
+        "title": "Porn Star Zombies",
         "imdb_rating": 2.4
     }
 ]
