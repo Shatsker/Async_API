@@ -40,10 +40,10 @@ app.include_router(
 
 @app.on_event('startup')
 async def startup():
-    redis.redis = await aioredis.create_redis_pool(
-        (settings.redis_host, settings.redis_port),
-        minsize=10,
-        maxsize=20,
+    redis.redis = aioredis.from_url(
+        f'redis://{settings.redis_host}',
+        encoding="utf-8",
+        decode_responses=True,
     )
     elastic.es = elasticsearch.AsyncElasticsearch(
         hosts=[f'{settings.elastic_host}:{settings.elastic_port}'],
@@ -54,7 +54,6 @@ async def startup():
 async def shutdown():
     await redis.redis.close()
     await elastic.es.close()
-
 
 if __name__ == '__main__':
     uvicorn.run(

@@ -1,5 +1,4 @@
 import json
-
 from typing import Optional
 
 from aioredis import Redis
@@ -10,8 +9,7 @@ from pydantic import BaseModel
 
 from db.elastic import get_elastic
 from db.redis import get_redis
-
-from .base import BaseCacheService, BaseSearchService
+from services.base import BaseCacheService, BaseSearchService
 
 
 class RedisCacheService(BaseCacheService):
@@ -41,22 +39,20 @@ class RedisCacheService(BaseCacheService):
             self,
             cache_id: str,
             cache_models,
-            expire: str,
+            expire: int,
             many: bool = False
     ):
         """Добавляем фильм из elastic'а в кеш по его id."""
-        data_for_caching = None
 
-        if cache_models and many:
+        if many:
             data_for_caching = json.dumps([ch.json() for ch in cache_models])
-
-        elif cache_models and not many:
+        else:
             data_for_caching = cache_models.json()
 
         await self.redis.set(
             cache_id,
             data_for_caching,
-            expire=expire,
+            ex=expire,
         )
 
 
@@ -80,7 +76,6 @@ class ElasticSearchService(BaseSearchService):
            имеется пагинация, сортировка и фильтрация.
         """
         from_ = None
-        body = None
 
         if page_number is not None and page_size is not None:
             from_ = self._get_page_offset_for_elastic(page_number, page_size)
@@ -88,15 +83,12 @@ class ElasticSearchService(BaseSearchService):
         if sort is not None:
             sort = self._get_sort_for_elastic(sort)
 
-        if filter_by_nested is not None:
-            body = self._get_query_for_getting_fw_by_id_of_nested_object_in_elastic(filter_by_nested)
-
         documents = await self.elastic.search(
             index=index_of_docs,
             size=page_size,
             from_=from_,
             sort=sort,
-            body=body,
+            body=filter_by_nested,
         )
         return [model(**doc['_source']) for doc in documents['hits']['hits']]
 
@@ -159,38 +151,3 @@ class ElasticSearchService(BaseSearchService):
                 }
             }
         }
-
-    @staticmethod
-    def _get_query_for_getting_fw_by_id_of_nested_object_in_elastic(
-            filter_info: dict[str, str],
-    ) -> Optional[dict]:
-        """Получаем фильмы с переданным названием nested_object'а в elastic'е
-           и значением его id.
-        """
-        nested_obj_name = filter_info.get('name', None)
-        nested_obj_value = filter_info.get('value', None)
-        if nested_obj_name and nested_obj_value:
-            return {
-                "query": {
-                    "bool": {
-                        "must": [
-                            {
-                                "nested": {
-                                    "path": nested_obj_name,
-                                    "query": {
-                                        "bool": {
-                                            "must": [
-                                                {
-                                                    "match": {
-                                                        f"{nested_obj_name}.id": nested_obj_value
-                                                    }
-                                                }
-                                            ]
-                                        }
-                                    }
-                                }
-                            }
-                        ]
-                    }
-                }
-            }

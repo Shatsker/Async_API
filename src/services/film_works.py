@@ -5,8 +5,9 @@ from uuid import UUID
 from fastapi import Depends
 
 from core.config import settings
-from core.enums import ElasticIndexes, NestedObjectsFilter
+from core.enums import ElasticIndexes
 from models.film_works import FilmWork
+from queries.es.film_work.nested_search import get_nested_search_query_by_genre
 
 from .base import BaseServicesMixin
 from .low_level_services import ElasticSearchService
@@ -15,7 +16,7 @@ from .low_level_services import ElasticSearchService
 class FilmService(BaseServicesMixin):
     """Класс, для бизнес-логики к фильмам."""
 
-    async def get_film_works_from_storage_or_cache(
+    async def get_film_works_from_storage(
             self,
             page_size: Optional[int],
             page_number: Optional[int],
@@ -31,10 +32,7 @@ class FilmService(BaseServicesMixin):
             page_size=page_size,
             page_number=page_number,
             index_of_docs=ElasticIndexes.MOVIES.value,
-            filter_by_nested={
-                'name': NestedObjectsFilter.GENRES.value,
-                'value': filter_genre
-            },
+            filter_by_nested=get_nested_search_query_by_genre(filter_genre),
         )
 
     async def get_film_works_by_searching(

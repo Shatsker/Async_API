@@ -3,10 +3,9 @@ from typing import Optional
 from uuid import UUID
 
 from fastapi.exceptions import HTTPException
-from fastapi.params import Depends, Query, Path
-from fastapi.routing import APIRouter
+from fastapi.params import Depends, Path, Query
 from fastapi.requests import Request
-
+from fastapi.routing import APIRouter
 from pydantic import parse_obj_as
 
 from core.config import settings
@@ -47,7 +46,8 @@ async def get_film_works(
         sort: str = Query(settings.default_sort_for_filmwork, description='Сортировка по полю фильма.'),
 ) -> list[Optional[FilmWorkResponse]]:
     """Обработчик запроса всех фильмов - с сортировкой, фильтрацией и тд."""
-    film_works = await service.get_film_works_from_storage_or_cache(
+
+    film_works = await service.get_film_works_from_storage(
         page_size=page_size,
         page_number=page_number,
         filter_genre=filter_genre,
