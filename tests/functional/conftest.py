@@ -40,6 +40,7 @@ async def redis_client():
         url=f'redis://{test_settings.redis_host}',
         encoding="utf-8",
     )
+    await client.flushall()
     yield client
     await client.close()
 
