@@ -46,7 +46,6 @@ async def get_film_works(
         sort: str = Query(settings.default_sort_for_filmwork, description='Сортировка по полю фильма.'),
 ) -> list[Optional[FilmWorkResponse]]:
     """Обработчик запроса всех фильмов - с сортировкой, фильтрацией и тд."""
-    # FIXME: если у фильмов нет ни одного жанра и есть filter_genre, то запрос свалится из за редиса. @shatsker_n поправить бы
 
     film_works = await service.get_film_works_from_storage(
         page_size=page_size,
