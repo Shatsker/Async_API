@@ -4,10 +4,10 @@ from uuid import UUID
 
 from fastapi.params import Depends
 
-from core.enums import ElasticIndexes
-from models.genres import Genre
-from services.base import BaseServicesMixin
-from services.low_level_services import ElasticSearchService
+from src.core.enums import ElasticIndexes
+from src.models.genres import Genre
+from src.services.base import BaseServicesMixin
+from src.services.low_level_services import ElasticSearchService
 
 
 class GenreService(BaseServicesMixin):

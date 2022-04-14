@@ -4,15 +4,14 @@ from uuid import UUID
 
 from fastapi.exceptions import HTTPException
 from fastapi.params import Depends
-from fastapi.routing import APIRouter
 from fastapi.requests import Request
-
+from fastapi.routing import APIRouter
 from pydantic import parse_obj_as
 
-from core.config import settings
-from decorators import cache_result_of_handler
-from models.genres import GenreResponse
-from services.genres import GenreService, get_genre_service
+from src.core.config import settings
+from src.decorators import cache_result_of_handler
+from src.models.genres import GenreResponse
+from src.services.genres import GenreService, get_genre_service
 
 router = APIRouter()
 

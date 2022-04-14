@@ -16,7 +16,7 @@ class TestSettings(BaseSettings):
     elastic_host: str = Field('127.0.0.1', env='ELASTIC_HOST')
     elastic_port: int = Field(9200, env='ELASTIC_PORT')
 
-    service_api_url: str = 'http://0.0.0.0:8000'
+    service_api_url: str = 'http://app:8000'
     api_v1_prefix: str = '/api/v1'
 
 

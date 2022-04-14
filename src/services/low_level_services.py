@@ -7,9 +7,9 @@ from elasticsearch.exceptions import NotFoundError
 from fastapi.params import Depends
 from pydantic import BaseModel
 
-from db.elastic import get_elastic
-from db.redis import get_redis
-from services.base import BaseCacheService, BaseSearchService
+from src.db.elastic import get_elastic
+from src.db.redis import get_redis
+from src.services.base import BaseCacheService, BaseSearchService
 
 
 class RedisCacheService(BaseCacheService):

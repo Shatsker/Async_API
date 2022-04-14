@@ -1,12 +1,11 @@
 import datetime
-
 from typing import Optional
 
 from pydantic import Field
 
-from .base import BaseModelConfig, MixinAllowPopulation
-from .genres import Genre
-from .persons import Actor, Director, Writer
+from src.models.base import BaseModelConfig, MixinAllowPopulation
+from src.models.genres import Genre
+from src.models.persons import Actor, Director, Writer
 
 
 class FilmWork(BaseModelConfig):

@@ -8,7 +8,7 @@ import pytest
 from elasticsearch import AsyncElasticsearch
 from multidict import CIMultiDictProxy
 
-from .settings import test_settings
+from tests.functional.settings import test_settings
 
 SERVICE_URL = test_settings.service_api_url
 
