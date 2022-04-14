@@ -27,7 +27,7 @@ services:
       - app
     env_file:
       - ../../src/.env
-    entrypoint: >
-      sh -c "python3 tests/functional/wait_for_redis.py
-      && python3 tests/functional/wait_for_es.py
-      && pytest --tb=native tests/functional/src"
+    command: >
+      sh -c "./wait-for-it.sh redis:6379
+      && ./wait-for-it.sh elastic:9200
+      && pytest ."

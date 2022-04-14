@@ -6,6 +6,7 @@ RUN  \
     apk update && \
     apk upgrade && \
     apk add build-base && \
+    apk add bash && \
     pip install --upgrade pip && \
     pip install -U setuptools pip
 

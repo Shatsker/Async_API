@@ -2,11 +2,11 @@ import json
 from uuid import UUID
 
 import pytest
-from tests.functional.conftest import SERVICE_URL
-from tests.functional.settings import test_settings
 
 from src.models.film_works import FilmWorkResponse
 from src.models.persons import PersonResponse
+from tests.functional.conftest import SERVICE_URL
+from tests.functional.settings import test_settings
 
 pytestmark = pytest.mark.asyncio
 
@@ -189,6 +189,5 @@ async def test_get_persons_film_works_with_redis_handler(
     )
 
     redis_data = [FilmWorkResponse.parse_raw(ch) for ch in json.loads(redis_data)]
-    print(redis_data)
 
     assert redis_data == should_be
