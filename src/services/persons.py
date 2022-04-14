@@ -54,7 +54,7 @@ class PersonService(BaseServicesMixin):
             return film_works
 
         # определено локально в методе чтобы не вызывать рекурсию зависимостей
-        film_service = get_film_service(elastic=self.search_service)
+        film_service = get_film_service(search_service=self.search_service)
 
         for film_id in person.film_ids:
             film = await film_service.get_film_work_by_id(str(film_id))
@@ -65,6 +65,6 @@ class PersonService(BaseServicesMixin):
 
 @lru_cache()
 def get_person_service(
-        elastic: ElasticSearchService = Depends(ElasticSearchService),
+        search_service: ElasticSearchService = Depends(ElasticSearchService),
 ):
-    return PersonService(elastic)
+    return PersonService(search_service)
