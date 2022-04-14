@@ -64,6 +64,6 @@ class FilmService(BaseServicesMixin):
 
 @lru_cache()
 def get_film_service(
-        elastic: ElasticSearchService = Depends(ElasticSearchService),
+        search_service: ElasticSearchService = Depends(ElasticSearchService),
 ):
-    return FilmService(elastic)
+    return FilmService(search_service)

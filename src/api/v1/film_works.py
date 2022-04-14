@@ -13,6 +13,8 @@ from decorators import cache_result_of_handler
 from models.film_works import FilmWorkResponse, FullFilmWorkResponse
 from services.film_works import FilmService, get_film_service
 
+from .params import PaginatedParams
+
 router = APIRouter()
 
 
@@ -40,16 +42,16 @@ async def get_film_by_id(
 async def get_film_works(
         request: Request,
         service: FilmService = Depends(get_film_service),
-        page_size: int = Query(settings.default_page_size, alias='page[size]', description='Размер страницы.'),
-        page_number: int = Query(settings.default_page_number, alias='page[number]', description='Номер страницы.'),
+        pagination: PaginatedParams = Depends(PaginatedParams),
         filter_genre: str = Query(None, alias='filter[genre]', description='Сортировка по жанрам'),
         sort: str = Query(settings.default_sort_for_filmwork, description='Сортировка по полю фильма.'),
 ) -> list[Optional[FilmWorkResponse]]:
-    """Обработчик запроса всех фильмов - с сортировкой, фильтрацией и тд."""
-
+    """Обработчик запроса всех фильмов - с сортировкой, фильтрацией,
+        пагинацией и тд.
+    """
     film_works = await service.get_film_works_from_storage(
-        page_size=page_size,
-        page_number=page_number,
+        page_size=pagination.page_size,
+        page_number=pagination.page_number,
         filter_genre=filter_genre,
         sort=sort,
     )
@@ -61,16 +63,15 @@ async def get_film_works(
 async def get_searched_film_works(
         request: Request,
         service: FilmService = Depends(get_film_service),
-        page_size: int = Query(settings.default_page_size, alias='page[size]', description='Размер страницы.'),
-        page_number: int = Query(settings.default_page_number, alias='page[number]', description='Номер страницы.'),
+        pagination: PaginatedParams = Depends(PaginatedParams),
         search_query: str = Query(None, alias='query', description='Поиск по кинопроизведениям.'),
 ) -> list[Optional[FilmWorkResponse]]:
     """Обработчик запроса на поиск по фильмам.
        Настройки по поисковым полям и т.д. можно найти в core/config.py
     """
     film_works = await service.get_film_works_by_searching(
-        page_size=page_size,
-        page_number=page_number,
+        page_size=pagination.page_size,
+        page_number=pagination.page_number,
         search_query=search_query,
     )
     return parse_obj_as(list[FilmWorkResponse], film_works)
