@@ -1,6 +1,6 @@
 from pydantic import Field
 
-from .base import BaseModelConfig, MixinAllowPopulation
+from src.models.base import BaseModelConfig, MixinAllowPopulation
 
 
 class Genre(BaseModelConfig):

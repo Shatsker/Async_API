@@ -1,8 +1,7 @@
 import orjson
-
 from pydantic import BaseModel
 
-from core.utils import orjson_dumps
+from src.core.utils import orjson_dumps
 
 
 class BaseModelConfig(BaseModel):

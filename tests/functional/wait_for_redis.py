@@ -1,16 +1,18 @@
 import asyncio
 
-from aioredis import create_redis_pool
+import aioredis
 from settings import test_settings
 
 
 async def wait_for_redis():
     """Функция ожидания подъёма redis'а перед тестами."""
-    redis = await create_redis_pool(
-        (test_settings.redis_host, test_settings.redis_port),
-        minsize=10,
-        maxsize=20,
+    print(1)
+    redis = await aioredis.from_url(
+        f'redis://{test_settings.redis_host}',
+        encoding="utf-8",
+        decode_responses=True,
     )
+    print(2)
 
     while True:
         if await redis.ping() == b'PONG':

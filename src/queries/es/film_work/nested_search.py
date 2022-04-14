@@ -1,4 +1,4 @@
-from core.enums import NestedObjectsFilter
+from src.core.enums import NestedObjectsFilter
 
 
 def get_nested_search_query_by_genre(genre_name: str):

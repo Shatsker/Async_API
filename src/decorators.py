@@ -2,8 +2,8 @@ from functools import wraps
 
 from fastapi.requests import Request
 
-from db.redis import get_redis
-from services.low_level_services import RedisCacheService
+from src.db.redis import get_redis
+from src.services.low_level_services import RedisCacheService
 
 
 def cache_result_of_handler(model, expire: int, many=False):

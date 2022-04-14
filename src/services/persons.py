@@ -4,13 +4,13 @@ from uuid import UUID
 
 from fastapi.params import Depends
 
-from core.config import settings
-from core.enums import ElasticIndexes
-from models.film_works import FilmWorkResponse
-from models.persons import Person
-from services.base import BaseServicesMixin
-from services.film_works import get_film_service
-from services.low_level_services import ElasticSearchService
+from src.core.config import settings
+from src.core.enums import ElasticIndexes
+from src.models.film_works import FilmWorkResponse
+from src.models.persons import Person
+from src.services.base import BaseServicesMixin
+from src.services.film_works import get_film_service
+from src.services.low_level_services import ElasticSearchService
 
 
 class PersonService(BaseServicesMixin):

@@ -4,13 +4,12 @@ from uuid import UUID
 
 from fastapi import Depends
 
-from core.config import settings
-from core.enums import ElasticIndexes
-from models.film_works import FilmWork
-from queries.es.film_work.nested_search import get_nested_search_query_by_genre
-
-from .base import BaseServicesMixin
-from .low_level_services import ElasticSearchService
+from src.core.config import settings
+from src.core.enums import ElasticIndexes
+from src.models.film_works import FilmWork
+from src.queries.es.film_work.nested_search import get_nested_search_query_by_genre
+from src.services.base import BaseServicesMixin
+from src.services.low_level_services import ElasticSearchService
 
 
 class FilmService(BaseServicesMixin):

@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from typing import Union
 from uuid import UUID
 
-from core.enums import ElasticIndexes
+from src.core.enums import ElasticIndexes
 
 
 class BaseCacheService(ABC):
