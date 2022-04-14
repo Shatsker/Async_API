@@ -7,6 +7,8 @@ from src.models.film_works import FilmWorkResponse
 from src.models.persons import PersonResponse
 from tests.functional.conftest import SERVICE_URL
 from tests.functional.settings import test_settings
+from tests.functional.testdata.person import (CAITLIN_FOWLER, FAKE_PERSON_SHORT_DATA, FAKE_PERSON_UUID, KEIICHI_ABE,
+                                              KEIICHI_ABE_FILMS)
 
 pytestmark = pytest.mark.asyncio
 
@@ -20,16 +22,7 @@ pytestmark = pytest.mark.asyncio
                 'method': '/persons/search?query=captain&page[number]=1&page[size]=50',
             },
             [
-                {
-                    "uuid": "24de5fe8-985c-4e73-92d4-da015d4beea4",
-                    "full_name": "Caitlin Fowler",
-                    "roles": [
-                        "actor"
-                    ],
-                    "film_ids": [
-                        "527aaa26-776b-41b1-892a-d062955a49f6"
-                    ]
-                }
+                CAITLIN_FOWLER
             ],
         ],
         [
@@ -57,9 +50,9 @@ async def test_search_person_with_redis_handler(
 ):
     should_be = [
         PersonResponse(
-            uuid='24de5fe8-985c-4e73-92d4-da015d4beea4',
+            uuid=CAITLIN_FOWLER['uuid'],
             full_name='Caitlin Fowler', roles=['actor'],
-            film_ids=[UUID('527aaa26-776b-41b1-892a-d062955a49f6')]
+            film_ids=[UUID(f_id) for f_id in CAITLIN_FOWLER['film_ids']]
         )
     ]
 
@@ -81,25 +74,16 @@ async def test_search_person_with_redis_handler(
         [
             """Получает из ES персону по uuid""",
             {
-                'method': '/persons/e65bfab5-6589-43cd-a48a-24d26b53a2be',
+                'method': f'/persons/{KEIICHI_ABE["uuid"]}',
             },
-            {
-                "uuid": "e65bfab5-6589-43cd-a48a-24d26b53a2be",
-                "full_name": "Keiichi Abe",
-                "roles": [
-                    "writer"
-                ],
-                "film_ids": [
-                    "547147ed-d835-4c22-8c42-4a800d6f32b0"
-                ]
-            },
+            KEIICHI_ABE,
         ],
         [
             """Получает из ES персону по uuid, но такого uuid у нас нет - валимся в 404""",
             {
-                'method': '/persons/e65bfab5-6666-43cd-a48a-24d26b53a2be',
+                'method': f'/persons/{FAKE_PERSON_UUID}',
             },
-            {'detail': 'Person was not found'},
+            FAKE_PERSON_SHORT_DATA,
         ],
     ]
 
@@ -118,16 +102,16 @@ async def test_get_persons_by_id_with_redis_handler(
         es_client, redis_client, make_get_request
 ):
     should_be = PersonResponse(
-        uuid='e65bfab5-6589-43cd-a48a-24d26b53a2be',
-        full_name='Keiichi Abe', roles=['writer'],
-        film_ids=[UUID('547147ed-d835-4c22-8c42-4a800d6f32b0')]
+        uuid=KEIICHI_ABE['uuid'],
+        full_name=KEIICHI_ABE['full_name'], roles=KEIICHI_ABE['roles'],
+        film_ids=[UUID(f_id) for f_id in KEIICHI_ABE['film_ids']]
     )
 
     # кидаем запрос и ждем что ответ окажется в redis
-    await make_get_request(method='/persons/e65bfab5-6589-43cd-a48a-24d26b53a2be')
+    await make_get_request(method=f'/persons/{KEIICHI_ABE["uuid"]}')
 
     redis_data = await redis_client.get(
-        name=f'{SERVICE_URL}{test_settings.api_v1_prefix}/persons/e65bfab5-6589-43cd-a48a-24d26b53a2be',
+        name=f'{SERVICE_URL}{test_settings.api_v1_prefix}/persons/{KEIICHI_ABE["uuid"]}',
     )
 
     redis_data = PersonResponse.parse_raw(redis_data)
@@ -141,20 +125,14 @@ async def test_get_persons_by_id_with_redis_handler(
         [
             """Получает из ES фильмы по персоне""",
             {
-                'method': '/persons/e65bfab5-6589-43cd-a48a-24d26b53a2be/film',
+                'method': f'/persons/{KEIICHI_ABE["uuid"]}/film',
             },
-            [
-                {
-                    "uuid": "547147ed-d835-4c22-8c42-4a800d6f32b0",
-                    "title": "Star Force: Fugitive Alien II",
-                    "imdb_rating": 1.9
-                }
-            ],
+            KEIICHI_ABE_FILMS,
         ],
         [
             """Получает из ES фильмы по uuid персоны, но такого uuid у нас нет - получаем пустой список""",
             {
-                'method': '/persons/e65bfab5-6666-43cd-a48a-24d26b53a2be/film',
+                'method': f'/persons/{FAKE_PERSON_UUID}/film',
             },
             [],
         ],
@@ -175,17 +153,14 @@ async def test_get_persons_film_works_with_redis_handler(
         es_client, redis_client, make_get_request
 ):
     should_be = [
-        FilmWorkResponse(
-            uuid='547147ed-d835-4c22-8c42-4a800d6f32b0',
-            title='Star Force: Fugitive Alien II',
-            imdb_rating=1.9)
+        FilmWorkResponse(**KEIICHI_ABE_FILMS[0])
     ]
 
     # кидаем запрос и ждем что ответ окажется в redis
-    await make_get_request(method='/persons/e65bfab5-6589-43cd-a48a-24d26b53a2be/film')
+    await make_get_request(method=f'/persons/{KEIICHI_ABE["uuid"]}/film')
 
     redis_data = await redis_client.get(
-        name=f'{SERVICE_URL}{test_settings.api_v1_prefix}/persons/e65bfab5-6589-43cd-a48a-24d26b53a2be/film',
+        name=f'{SERVICE_URL}{test_settings.api_v1_prefix}/persons/{KEIICHI_ABE["uuid"]}/film',
     )
 
     redis_data = [FilmWorkResponse.parse_raw(ch) for ch in json.loads(redis_data)]
