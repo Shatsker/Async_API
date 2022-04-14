@@ -8,10 +8,10 @@ from fastapi.requests import Request
 from fastapi.routing import APIRouter
 from pydantic import parse_obj_as
 
-from core.config import settings
-from decorators import cache_result_of_handler
-from models.film_works import FilmWorkResponse, FullFilmWorkResponse
-from services.film_works import FilmService, get_film_service
+from src.core.config import settings
+from src.decorators import cache_result_of_handler
+from src.models.film_works import FilmWorkResponse, FullFilmWorkResponse
+from src.services.film_works import FilmService, get_film_service
 
 from .params import PaginatedParams
 

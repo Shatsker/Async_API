@@ -1,6 +1,6 @@
 from fastapi import Query
 
-from core.config import settings
+from src.core.config import settings
 
 
 class PaginatedParams:

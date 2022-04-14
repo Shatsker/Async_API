@@ -8,13 +8,12 @@ from fastapi.requests import Request
 from fastapi.routing import APIRouter
 from pydantic import parse_obj_as
 
-from core.config import settings
-from decorators import cache_result_of_handler
-from models.film_works import FilmWorkResponse
-from models.persons import PersonResponse
-from services.persons import PersonService, get_person_service
-
-from .params import PaginatedParams
+from src.api.v1.params import PaginatedParams
+from src.core.config import settings
+from src.decorators import cache_result_of_handler
+from src.models.film_works import FilmWorkResponse
+from src.models.persons import PersonResponse
+from src.services.persons import PersonService, get_person_service
 
 router = APIRouter()
 

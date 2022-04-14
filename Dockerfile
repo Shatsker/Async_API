@@ -6,6 +6,7 @@ RUN  \
     apk update && \
     apk upgrade && \
     apk add build-base && \
+    apk add bash && \
     pip install --upgrade pip && \
     pip install -U setuptools pip
 
@@ -21,4 +22,4 @@ RUN   \
 # copy project
 COPY . /app
 
-CMD cd src/ && gunicorn main:app  --bind 0.0.0.0:8000 --worker-class uvicorn.workers.UvicornWorker
+CMD gunicorn main:app  --bind 0.0.0.0:8000 --worker-class uvicorn.workers.UvicornWorker
