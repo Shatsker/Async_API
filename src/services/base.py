@@ -28,7 +28,7 @@ class BaseSearchService(ABC):
         pass
 
     @abstractmethod
-    def get_data_of_one_model_by_id_from_storage(
+    def get_data_of_one_model_by_id_from_storage(  # fixme: плохое название
             self,
             index: ElasticIndexes,
             model_id: Union[str, UUID],
@@ -42,8 +42,10 @@ class BaseSearchService(ABC):
         pass
 
 
-class BaseServicesMixin:
+class BaseServicesMixin:  # fixme: плохое название
     """Миксин с поиском."""
 
     def __init__(self, search_service: BaseSearchService):
         self.search_service = search_service
+
+    # fixme: добавить базовые методы

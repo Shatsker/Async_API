@@ -104,3 +104,10 @@ ALL_GENRES = [
         "name": "Game-Show"
     }
 ]
+DEFAULT_GENRE_UUID = '120a21cf-9097-479e-904a-13dd7198c1dd'
+DEFAULT_GENRE_SHORT_DATA = {
+    "uuid": "120a21cf-9097-479e-904a-13dd7198c1dd",
+    "name": "Adventure"
+}
+FAKE_GENRE_UUID = '120a21cf-9027-479e-904a-13dd7198c1dd'
+FAKE_GENRE_SHORT_DATA = {'detail': 'Genre not found'}
