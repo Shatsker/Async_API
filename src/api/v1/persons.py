@@ -1,12 +1,11 @@
+from http import HTTPStatus
 from typing import Optional
 from uuid import UUID
-from http import HTTPStatus
 
-from fastapi.params import Depends, Path, Query
-from fastapi.routing import APIRouter
-from fastapi.requests import Request
 from fastapi.exceptions import HTTPException
-
+from fastapi.params import Depends, Path, Query
+from fastapi.requests import Request
+from fastapi.routing import APIRouter
 from pydantic import parse_obj_as
 
 from core.config import settings
@@ -14,6 +13,8 @@ from decorators import cache_result_of_handler
 from models.film_works import FilmWorkResponse
 from models.persons import PersonResponse
 from services.persons import PersonService, get_person_service
+
+from .params import PaginatedParams
 
 router = APIRouter()
 
@@ -23,14 +24,13 @@ router = APIRouter()
 async def get_searched_persons(
         request: Request,
         service: PersonService = Depends(get_person_service),
-        page_size: int = Query(settings.default_page_size, alias='page[size]', description='Размер страницы.'),
-        page_number: int = Query(settings.default_page_number, alias='page[number]', description='Номер страницы.'),
+        pagination: PaginatedParams = Depends(PaginatedParams),
         search_query: str = Query(None, alias='query', description='Поиск по имени персоны.'),
 ) -> list[Optional[PersonResponse]]:
     """Обработчик запроса на поиск персон."""
     persons = await service.search_persons(
-        page_size=page_size,
-        page_number=page_number,
+        page_size=pagination.page_size,
+        page_number=pagination.page_number,
         search_query=search_query,
     )
     return parse_obj_as(list[PersonResponse], persons)
