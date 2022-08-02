@@ -34,6 +34,8 @@ class Settings(BaseSettings):
     fields_for_searching_filmworks: list[str] = ['title', 'description', 'genre', 'actors_names', 'writers_names']
     fields_for_searching_persons: list[str] = ['full_name', ]
 
+    authjwt_secret_key: str = "PQ98r_Xp2CUKUdF7kFBNHxjfrkrFze_oMhzr1i3MSI0"
+
 
 settings = Settings(
     _env_file='.env',

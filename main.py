@@ -5,6 +5,7 @@ import elasticsearch
 import uvicorn
 from fastapi import FastAPI
 from fastapi.responses import ORJSONResponse
+from fastapi_jwt_auth import AuthJWT
 
 from src.api.v1 import film_works, genres, persons
 from src.core.config import settings
@@ -54,6 +55,12 @@ async def startup():
 async def shutdown():
     await redis.redis.close()
     await elastic.es.close()
+
+
+@AuthJWT.load_config
+def get_config():
+    return settings
+
 
 if __name__ == '__main__':
     uvicorn.run(

@@ -21,6 +21,7 @@ class FilmService(BaseServicesMixin):
             page_number: Optional[int],
             filter_genre: Optional[str],
             sort: Optional[str],
+            roles: Optional[list[str]],
     ) -> Optional[list[FilmWork]]:
         """Возвращает фильмы, есть пагинация, сортировка & фильтрация.
            Достаёт из кеша или elastic'а, если кеш пуст.

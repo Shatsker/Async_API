@@ -5,6 +5,7 @@ from aioredis import Redis
 from elasticsearch import AsyncElasticsearch
 from elasticsearch.exceptions import NotFoundError
 from fastapi.params import Depends
+from fastapi_jwt_auth import AuthJWT
 from pydantic import BaseModel
 
 from src.db.elastic import get_elastic
@@ -151,3 +152,7 @@ class ElasticSearchService(BaseSearchService):
                 }
             }
         }
+
+
+def get_roles_from_jwt(Authorize: AuthJWT = Depends()):
+    return Authorize.get_raw_jwt()['roles']

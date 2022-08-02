@@ -12,6 +12,7 @@ from src.core.config import settings
 from src.decorators import cache_result_of_handler
 from src.models.film_works import FilmWorkResponse, FullFilmWorkResponse
 from src.services.film_works import FilmService, get_film_service
+from src.services.low_level_services import get_roles_from_jwt
 
 from .params import PaginatedParams
 
@@ -45,6 +46,7 @@ async def get_film_works(
         pagination: PaginatedParams = Depends(PaginatedParams),
         filter_genre: str = Query(None, alias='filter[genre]', description='Сортировка по жанрам'),
         sort: str = Query(settings.default_sort_for_filmwork, description='Сортировка по полю фильма.'),
+        roles: list[str] = Depends(get_roles_from_jwt),
 ) -> list[Optional[FilmWorkResponse]]:
     """Обработчик запроса всех фильмов - с сортировкой, фильтрацией,
         пагинацией и тд.
@@ -54,6 +56,7 @@ async def get_film_works(
         page_number=pagination.page_number,
         filter_genre=filter_genre,
         sort=sort,
+        roles=roles,
     )
     return parse_obj_as(list[FilmWorkResponse], film_works)
 
